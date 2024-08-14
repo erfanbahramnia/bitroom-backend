@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_bitroom
+    ports:
+      - 5432:5432
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: CSOeJxL3qn
+      POSTGRES_USER: bitroom_user
+      POSTGRES_DB: bitroom_db
+
+  app:
+    container_name: go_bitroom
+    build: .
+    ports:
+      - 8000:8000
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: bitroom_user
+      DB_PASS: CSOeJxL3qn
+      DB_NAME: bitroom_db
+      PORT: 8000
+    volumes:
+      - .:/app

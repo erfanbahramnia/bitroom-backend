@@ -1,0 +1,16 @@
+# .air.toml
+root = "."
+tmp_dir = "tmp"  # Temporary directory for compiled files
+
+[build]
+  bin = "main"  # Name of the binary
+  cmd = "go build -o ./tmp/main ."  # Command to build the binary
+  include_ext = ["go"]  # File extensions to watch for changes
+  exclude_dir = ["tmp", ".git"]  # Directories to exclude from watching
+
+[watch]
+  include = ["*.go"]  # Files to watch for changes
+  exclude = ["tmp"]  # Directories to exclude from watching
+
+[log]
+  level = "info"  # Log level
