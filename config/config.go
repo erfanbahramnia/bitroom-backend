@@ -25,7 +25,9 @@ type DbConfigStruct struct {
 }
 
 type ServerConfigStruct struct {
-	Port string
+	Port               string
+	JWT_SECRET         string
+	Jwt_REFRESH_SECRET string
 }
 
 // funcs
@@ -42,7 +44,9 @@ func initDbConfig() DbConfigStruct {
 
 func initServerConfig() ServerConfigStruct {
 	return ServerConfigStruct{
-		Port: GetEnv("PORT"),
+		Port:               GetEnv("PORT"),
+		JWT_SECRET:         GetEnv("JWT_SECRET"),
+		Jwt_REFRESH_SECRET: GetEnv("Jwt_REFRESH_SECRET"),
 	}
 }
 
