@@ -42,6 +42,10 @@ func (c *CategoryService) AddCategory(category NewCategory) *types.CustomError {
 }
 
 func (c *CategoryService) EditCategory(data EditCategory) *types.CustomError {
+	err := c.store.EditCategory(data)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -63,6 +63,20 @@ func (c *CategoryStore) AddChildCategory(data NewCategory) *types.CustomError {
 // --------------------------------------------------------------------------------------------------------
 
 func (c *CategoryStore) EditCategory(data EditCategory) *types.CustomError {
+	// check category exist
+	exists, err := c.CheckCategoryExist(data.ID)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
+	}
+	// update
+	var category category_model.Category
+	c.db.First(&category, data.ID)
+	category.Name = data.Name
+	c.db.Save(&category)
+	// success
 	return nil
 }
 

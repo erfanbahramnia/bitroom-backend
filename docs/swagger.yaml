@@ -173,6 +173,29 @@ paths:
       summary: Get Category By Id
       tags:
       - category
+  /category/{id}/{name}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Edit Category By Id
+      tags:
+      - category
   /category/add:
     post:
       consumes:
@@ -202,7 +225,7 @@ paths:
       responses:
         "201":
           description: Created
-      summary: Get Category By Id
+      summary: Get Categories
       tags:
       - category
   /category/tree:
@@ -214,7 +237,7 @@ paths:
       responses:
         "201":
           description: Created
-      summary: Get Category By Id
+      summary: Get Categorys with tree format
       tags:
       - category
 swagger: "2.0"

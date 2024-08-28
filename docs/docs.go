@@ -156,7 +156,7 @@ const docTemplate = `{
                 "tags": [
                     "category"
                 ],
-                "summary": "Get Category By Id",
+                "summary": "Get Categories",
                 "responses": {
                     "201": {
                         "description": "Created"
@@ -175,7 +175,7 @@ const docTemplate = `{
                 "tags": [
                     "category"
                 ],
-                "summary": "Get Category By Id",
+                "summary": "Get Categorys with tree format",
                 "responses": {
                     "201": {
                         "description": "Created"
@@ -200,6 +200,41 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Category ID",
                         "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
+        "/category/{id}/{name}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "Edit Category By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New Name",
+                        "name": "name",
                         "in": "path",
                         "required": true
                     }

@@ -26,6 +26,7 @@ func (c *CategoryHandler) InitHandler(ech *echo.Echo) {
 	group.GET("/:id", c.GetCategoryById)
 	group.GET("/all", c.GetCategories)
 	group.GET("/tree", c.GetCategoriesTree)
+	group.PUT("/:id/:name", c.EditCategory)
 }
 
 // @Summary Add Category
@@ -67,7 +68,7 @@ func (c *CategoryHandler) AddCategory(ctx echo.Context) error {
 
 // --------------------------------------------------------------------------------------------------------
 
-// @Summary Get Category By Id
+// @Summary Get Categories
 // @Tags category
 // @Accept json
 // @Produce json
@@ -86,7 +87,7 @@ func (c *CategoryHandler) GetCategories(ctx echo.Context) error {
 
 // --------------------------------------------------------------------------------------------------------
 
-// @Summary Get Category By Id
+// @Summary Get Categorys with tree format
 // @Tags category
 // @Accept json
 // @Produce json
@@ -124,14 +125,41 @@ func (c *CategoryHandler) GetCategoryById(ctx echo.Context) error {
 		return echo.NewHTTPError(getErr.Code, getErr.Message)
 	}
 	// success
-	ctx.JSON(http.StatusOK, category)
-	return nil
+	return ctx.JSON(http.StatusOK, category)
 }
 
 // --------------------------------------------------------------------------------------------------------
 
+// @Summary Edit Category By Id
+// @Tags category
+// @Accept json
+// @Produce json
+// @Param id path int true "Category ID"
+// @Param name path string true "New Name"
+// @Success 201
+// @Router /category/{id}/{name} [put]
 func (c *CategoryHandler) EditCategory(ctx echo.Context) error {
-	return nil
+	// get new name
+	name := ctx.Param("name")
+	if len(name) < 1 {
+		return echo.NewHTTPError(http.StatusBadRequest, constants.ProvideId)
+	}
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil || id < 1 {
+		return echo.NewHTTPError(http.StatusBadRequest, constants.ProvideId)
+	}
+	data := EditCategory{
+		Name: name,
+		ID:   uint(id),
+	}
+	// update
+	editErr := c.service.EditCategory(data)
+	if editErr != nil {
+		return echo.NewHTTPError(editErr.Code, editErr.Message)
+	}
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "successful",
+	})
 }
 
 // --------------------------------------------------------------------------------------------------------
