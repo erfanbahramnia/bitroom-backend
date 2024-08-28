@@ -51,9 +51,25 @@ func (c *CategoryService) DeleteCategory(id uint) *types.CustomError {
 	return nil
 }
 
-func (c *CategoryService) GetCategoryById(id uint) (*category_model.Category, *types.CustomError) {
+func (c *CategoryService) GetCategoryById(id uint) ([]*CategoryData, *types.CustomError) {
+	// get category
+	errChan := make(chan *types.CustomError, 1)
+	categoryChan := make(chan []*CategoryData, 1)
+	go func() {
+		category, err := c.store.GetCategoryById(id)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		categoryChan <- category
+	}()
 
-	return nil, nil
+	select {
+	case err := <-errChan:
+		return nil, err
+	case category := <-categoryChan:
+		return category, nil
+	}
 }
 
 func (c *CategoryService) GetCategories() ([]category_model.Category, *types.CustomError) {

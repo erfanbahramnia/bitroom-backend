@@ -4,6 +4,7 @@ import (
 	"bitroom/constants"
 	"bitroom/utils"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,6 +23,7 @@ func (c *CategoryHandler) InitHandler(ech *echo.Echo) {
 	group := ech.Group("category")
 
 	group.POST("/add", c.AddCategory)
+	group.GET("/:id", c.GetCategoryById)
 }
 
 // @Summary Add Category
@@ -61,21 +63,50 @@ func (c *CategoryHandler) AddCategory(ctx echo.Context) error {
 	})
 }
 
+// --------------------------------------------------------------------------------------------------------
+
 func (c *CategoryHandler) GetCategories(ctx echo.Context) error {
 	return nil
 }
+
+// --------------------------------------------------------------------------------------------------------
 
 func (c *CategoryHandler) GetCategoriesTree(ctx echo.Context) error {
 	return nil
 }
 
+// --------------------------------------------------------------------------------------------------------
+
+// @Summary Get Category By Id
+// @Tags category
+// @Accept json
+// @Produce json
+// @Param id path int true "Category ID"
+// @Success 201
+// @Router /category/{id} [get]
 func (c *CategoryHandler) GetCategoryById(ctx echo.Context) error {
+	// get category id
+	categoryId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil || categoryId < 1 {
+		return echo.NewHTTPError(http.StatusBadRequest, constants.ProvideId)
+	}
+	// get category
+	category, getErr := c.service.GetCategoryById(uint(categoryId))
+	if getErr != nil {
+		return echo.NewHTTPError(getErr.Code, getErr.Message)
+	}
+	// success
+	ctx.JSON(http.StatusOK, category)
 	return nil
 }
+
+// --------------------------------------------------------------------------------------------------------
 
 func (c *CategoryHandler) EditCategory(ctx echo.Context) error {
 	return nil
 }
+
+// --------------------------------------------------------------------------------------------------------
 
 func (c *CategoryHandler) DeleteCategory(ctx echo.Context) error {
 	return nil

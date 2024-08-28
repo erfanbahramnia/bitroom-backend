@@ -9,3 +9,10 @@ type EditCategory struct {
 	Name string `json:"name"`
 	ID   uint   `json:"id"`
 }
+
+type CategoryData struct {
+	Name     string          `json:"name"`
+	ID       uint            `json:"id"`
+	ParentID *uint           `json:"parent_id"`
+	Children []*CategoryData `json:"children"`
+}

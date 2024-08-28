@@ -155,6 +155,24 @@ paths:
       summary: Register
       tags:
       - auth
+  /category/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Get Category By Id
+      tags:
+      - category
   /category/add:
     post:
       consumes:
