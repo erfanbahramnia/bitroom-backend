@@ -8,4 +8,5 @@ const (
 	OtpExpired          = "otp code expired"
 	OtpInvalid          = "otp code is not valid"
 	UserHasNotPassword  = "user does not set password already"
+	NotFound            = "item not found"
 )

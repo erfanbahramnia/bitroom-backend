@@ -2,7 +2,7 @@ package api
 
 import (
 	"bitroom/auth"
-	"fmt"
+	"bitroom/category"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -13,11 +13,18 @@ import (
 // @BasePath /
 
 func InitApi(db *gorm.DB, ech *echo.Echo, port string) {
-	fmt.Println("api")
+	// auth apis
 	authStore := auth.NewAuthStore(db)
 	authService := auth.NewAuthService(authStore)
 	authHandler := auth.NewAuthHandler(authService)
 	authHandler.InitHandler(ech)
 
+	// category apis
+	categoryStore := category.NewCategoryStore(db)
+	categoryService := category.NewCategoryService(categoryStore)
+	categoryHandler := category.NewCategoryHandler(categoryService)
+	categoryHandler.InitHandler(ech)
+
+	// start server
 	ech.Logger.Fatal(ech.Start(port))
 }

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"bitroom/constants"
-	"bitroom/models"
+	user_model "bitroom/models/user"
 	"bitroom/types"
 	"bitroom/utils"
 	"net/http"
@@ -22,9 +22,9 @@ func NewAuthService(store AuthStoreInterface) *AuthService {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *AuthService) Login(user LoginCredential) (*models.User, *types.CustomError) {
+func (a *AuthService) Login(user LoginCredential) (*user_model.User, *types.CustomError) {
 	errorChan := make(chan *types.CustomError, 1)
-	userChan := make(chan *models.User, 1)
+	userChan := make(chan *user_model.User, 1)
 	go func() {
 		user, err := a.store.GetUserByPhone(user.Phone)
 		if err != nil {
@@ -83,7 +83,7 @@ func (a *AuthService) OtpGeneratingForRegister(phone string) (string, *types.Cus
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *AuthService) ValidateOtpRegister(data ValidateOtpRegistering) (*models.User, *types.CustomError) {
+func (a *AuthService) ValidateOtpRegister(data ValidateOtpRegistering) (*user_model.User, *types.CustomError) {
 	// get valid otp
 	c := utils.GetCache()
 	validOtp, found := c.Get(data.Phone)
@@ -97,7 +97,7 @@ func (a *AuthService) ValidateOtpRegister(data ValidateOtpRegistering) (*models.
 
 	// create new user
 	errChan := make(chan *types.CustomError, 1)
-	userIdChan := make(chan *models.User, 1)
+	userIdChan := make(chan *user_model.User, 1)
 	go func() {
 		user, err := a.store.CreateNewUser(data.Phone)
 		if err != nil {

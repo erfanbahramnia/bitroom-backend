@@ -1,18 +1,18 @@
 package auth
 
 import (
-	"bitroom/models"
+	user_model "bitroom/models/user"
 	"bitroom/types"
 )
 
 type AuthStoreInterface interface {
 	CheckUserExist(phone string) (bool, *types.CustomError)
-	CreateNewUser(phone string) (*models.User, *types.CustomError)
-	GetUserByPhone(phone string) (*models.User, *types.CustomError)
+	CreateNewUser(phone string) (*user_model.User, *types.CustomError)
+	GetUserByPhone(phone string) (*user_model.User, *types.CustomError)
 }
 
 type AuthServiceInterface interface {
-	Login(user LoginCredential) (*models.User, *types.CustomError)
+	Login(user LoginCredential) (*user_model.User, *types.CustomError)
 	OtpGeneratingForRegister(phone string) (string, *types.CustomError)
-	ValidateOtpRegister(data ValidateOtpRegistering) (*models.User, *types.CustomError)
+	ValidateOtpRegister(data ValidateOtpRegistering) (*user_model.User, *types.CustomError)
 }

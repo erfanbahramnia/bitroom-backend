@@ -70,6 +70,17 @@ definitions:
     - otp
     - phone
     type: object
+  category.NewCategory:
+    properties:
+      name:
+        maxLength: 50
+        type: string
+      parent_id:
+        minimum: 0
+        type: integer
+    required:
+    - name
+    type: object
   types.JwtTokens:
     properties:
       refreshToken:
@@ -144,4 +155,24 @@ paths:
       summary: Register
       tags:
       - auth
+  /category/add:
+    post:
+      consumes:
+      - application/json
+      description: Adding new category by admin
+      parameters:
+      - description: Adding new category
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/category.NewCategory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Add Category
+      tags:
+      - category
 swagger: "2.0"

@@ -113,6 +113,37 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/category/add": {
+            "post": {
+                "description": "Adding new category by admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "Add Category",
+                "parameters": [
+                    {
+                        "description": "Adding new category",
+                        "name": "category",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/category.NewCategory"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -212,6 +243,22 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 11,
                     "minLength": 11
+                }
+            }
+        },
+        "category.NewCategory": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "parent_id": {
+                    "type": "integer",
+                    "minimum": 0
                 }
             }
         },

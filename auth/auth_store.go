@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"bitroom/models"
+	user_model "bitroom/models/user"
 	"bitroom/types"
 	"bitroom/utils"
 	"fmt"
@@ -22,7 +22,7 @@ func NewAuthStore(db *gorm.DB) *AuthStore {
 
 func (a *AuthStore) CheckUserExist(phone string) (bool, *types.CustomError) {
 	var exists bool
-	err := a.db.Model(&models.User{}).Select("count(*) > 0").Where("phone = ?", phone).Scan(&exists).Error
+	err := a.db.Model(&user_model.User{}).Select("count(*) > 0").Where("phone = ?", phone).Scan(&exists).Error
 	if err != nil {
 		fmt.Println(err)
 		return false, utils.NewError("internal server error", http.StatusInternalServerError)
@@ -30,9 +30,9 @@ func (a *AuthStore) CheckUserExist(phone string) (bool, *types.CustomError) {
 	return exists, nil
 }
 
-func (a *AuthStore) CreateNewUser(phone string) (*models.User, *types.CustomError) {
+func (a *AuthStore) CreateNewUser(phone string) (*user_model.User, *types.CustomError) {
 	// save new user
-	newUser := models.User{
+	newUser := user_model.User{
 		Phone: phone,
 	}
 	if err := a.db.Create(&newUser).Error; err != nil {
@@ -44,8 +44,8 @@ func (a *AuthStore) CreateNewUser(phone string) (*models.User, *types.CustomErro
 	return &newUser, nil
 }
 
-func (a *AuthStore) GetUserByPhone(phone string) (*models.User, *types.CustomError) {
-	var user models.User
+func (a *AuthStore) GetUserByPhone(phone string) (*user_model.User, *types.CustomError) {
+	var user user_model.User
 
 	if err := a.db.Where("phone = ?", phone).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
