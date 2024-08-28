@@ -1,7 +1,6 @@
 package category
 
 import (
-	category_model "bitroom/models/category"
 	"bitroom/types"
 	"sync"
 )
@@ -72,12 +71,44 @@ func (c *CategoryService) GetCategoryById(id uint) ([]*CategoryData, *types.Cust
 	}
 }
 
-func (c *CategoryService) GetCategories() ([]category_model.Category, *types.CustomError) {
+func (c *CategoryService) GetCategories() ([]*CategoryData, *types.CustomError) {
+	// get categories
+	errChan := make(chan *types.CustomError, 1)
+	categoryChan := make(chan []*CategoryData, 1)
+	go func() {
+		categories, err := c.store.GetCategories()
+		if err != nil {
+			errChan <- err
+			return
+		}
+		categoryChan <- categories
+	}()
 
-	return nil, nil
+	select {
+	case err := <-errChan:
+		return nil, err
+	case categories := <-categoryChan:
+		return categories, nil
+	}
 }
 
-func (c *CategoryService) GetCategoriesTree() ([]category_model.Category, *types.CustomError) {
+func (c *CategoryService) GetCategoriesTree() ([]*CategoryData, *types.CustomError) {
+	// get categories
+	errChan := make(chan *types.CustomError, 1)
+	categoryChan := make(chan []*CategoryData, 1)
+	go func() {
+		categories, err := c.store.GetCategoriesTree()
+		if err != nil {
+			errChan <- err
+			return
+		}
+		categoryChan <- categories
+	}()
 
-	return nil, nil
+	select {
+	case err := <-errChan:
+		return nil, err
+	case categories := <-categoryChan:
+		return categories, nil
+	}
 }

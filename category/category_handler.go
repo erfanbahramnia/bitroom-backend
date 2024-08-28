@@ -24,6 +24,8 @@ func (c *CategoryHandler) InitHandler(ech *echo.Echo) {
 
 	group.POST("/add", c.AddCategory)
 	group.GET("/:id", c.GetCategoryById)
+	group.GET("/all", c.GetCategories)
+	group.GET("/tree", c.GetCategoriesTree)
 }
 
 // @Summary Add Category
@@ -65,14 +67,40 @@ func (c *CategoryHandler) AddCategory(ctx echo.Context) error {
 
 // --------------------------------------------------------------------------------------------------------
 
+// @Summary Get Category By Id
+// @Tags category
+// @Accept json
+// @Produce json
+// @Success 201
+// @Router /category/all [get]
 func (c *CategoryHandler) GetCategories(ctx echo.Context) error {
-	return nil
+	categories, err := c.service.GetCategories()
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"categories": categories,
+	})
 }
 
 // --------------------------------------------------------------------------------------------------------
 
+// @Summary Get Category By Id
+// @Tags category
+// @Accept json
+// @Produce json
+// @Success 201
+// @Router /category/tree [get]
 func (c *CategoryHandler) GetCategoriesTree(ctx echo.Context) error {
-	return nil
+	categories, err := c.service.GetCategoriesTree()
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"categories": categories,
+	})
 }
 
 // --------------------------------------------------------------------------------------------------------

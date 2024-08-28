@@ -1,7 +1,6 @@
 package category
 
 import (
-	category_model "bitroom/models/category"
 	"bitroom/types"
 )
 
@@ -11,8 +10,8 @@ type CategoryStoreInterface interface {
 	EditCategory(data EditCategory) *types.CustomError
 	DeleteCategory(id uint) *types.CustomError
 	GetCategoryById(id uint) ([]*CategoryData, *types.CustomError)
-	GetCategories() ([]category_model.Category, *types.CustomError)
-	GetCategoriesTree() ([]category_model.Category, *types.CustomError)
+	GetCategories() ([]*CategoryData, *types.CustomError)
+	GetCategoriesTree() ([]*CategoryData, *types.CustomError)
 	CheckCategoryExist(id uint) (bool, *types.CustomError)
 }
 
@@ -21,6 +20,6 @@ type CategoryServiceInterface interface {
 	EditCategory(data EditCategory) *types.CustomError
 	DeleteCategory(id uint) *types.CustomError
 	GetCategoryById(id uint) ([]*CategoryData, *types.CustomError)
-	GetCategories() ([]category_model.Category, *types.CustomError)
-	GetCategoriesTree() ([]category_model.Category, *types.CustomError)
+	GetCategories() ([]*CategoryData, *types.CustomError)
+	GetCategoriesTree() ([]*CategoryData, *types.CustomError)
 }

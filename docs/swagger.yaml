@@ -193,4 +193,28 @@ paths:
       summary: Add Category
       tags:
       - category
+  /category/all:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Get Category By Id
+      tags:
+      - category
+  /category/tree:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Get Category By Id
+      tags:
+      - category
 swagger: "2.0"

@@ -20,6 +20,8 @@ func NewCategoryStore(db *gorm.DB) *CategoryStore {
 	}
 }
 
+// --------------------------------------------------------------------------------------------------------
+
 func (c *CategoryStore) AddCategory(name string) *types.CustomError {
 	// create new category
 	category := category_model.Category{
@@ -33,6 +35,8 @@ func (c *CategoryStore) AddCategory(name string) *types.CustomError {
 	}
 	return nil
 }
+
+// --------------------------------------------------------------------------------------------------------
 
 func (c *CategoryStore) AddChildCategory(data NewCategory) *types.CustomError {
 	// check parent exist
@@ -56,14 +60,20 @@ func (c *CategoryStore) AddChildCategory(data NewCategory) *types.CustomError {
 	return nil
 }
 
+// --------------------------------------------------------------------------------------------------------
+
 func (c *CategoryStore) EditCategory(data EditCategory) *types.CustomError {
 	return nil
 }
+
+// --------------------------------------------------------------------------------------------------------
 
 func (c *CategoryStore) DeleteCategory(id uint) *types.CustomError {
 
 	return nil
 }
+
+// --------------------------------------------------------------------------------------------------------
 
 func (c *CategoryStore) GetCategoryById(id uint) ([]*CategoryData, *types.CustomError) {
 	var categories []category_model.Category
@@ -86,15 +96,41 @@ func (c *CategoryStore) GetCategoryById(id uint) ([]*CategoryData, *types.Custom
 	return data, nil
 }
 
-func (c *CategoryStore) GetCategories() ([]category_model.Category, *types.CustomError) {
+func (c *CategoryStore) GetCategories() ([]*CategoryData, *types.CustomError) {
+	// get all categories
+	var categories []category_model.Category
+	if err := c.db.Select("name, id, parent_id").Find(&categories).Error; err != nil {
+		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
 
-	return nil, nil
+	var data []*CategoryData
+	for _, category := range categories {
+		item := &CategoryData{
+			ID:       category.ID,
+			Name:     category.Name,
+			ParentID: category.ParentID,
+		}
+		data = append(data, item)
+	}
+	// success
+	return data, nil
 }
 
-func (c *CategoryStore) GetCategoriesTree() ([]category_model.Category, *types.CustomError) {
+// --------------------------------------------------------------------------------------------------------
 
-	return nil, nil
+func (c *CategoryStore) GetCategoriesTree() ([]*CategoryData, *types.CustomError) {
+	// get all categories
+	var categories []category_model.Category
+	if err := c.db.Select("name, id, parent_id").Find(&categories).Error; err != nil {
+		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// convert array to tree
+	data := arrayToTree(categories)
+	// success
+	return data, nil
 }
+
+// --------------------------------------------------------------------------------------------------------
 
 func (c *CategoryStore) CheckCategoryExist(id uint) (bool, *types.CustomError) {
 	var exists bool
@@ -104,6 +140,8 @@ func (c *CategoryStore) CheckCategoryExist(id uint) (bool, *types.CustomError) {
 	}
 	return exists, nil
 }
+
+// --------------------------------------------------------------------------------------------------------
 
 func arrayToTree(categories []category_model.Category) []*CategoryData {
 	categoryMap := make(map[uint]*CategoryData)
