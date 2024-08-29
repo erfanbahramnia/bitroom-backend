@@ -60,6 +60,18 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/article/all": {
+            "get": {
+                "description": "get all articles",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "responses": {}
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "User registration",

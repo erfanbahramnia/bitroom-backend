@@ -43,9 +43,13 @@ func (a *ArticleStore) AddArticle(data *NewArticle) (*Article, *types.CustomErro
 	}, nil
 }
 
-func (a *ArticleStore) GetArticles() ([]Article, *types.CustomError) {
-
-	return nil, nil
+func (a *ArticleStore) GetArticles() ([]MinimumArtilce, *types.CustomError) {
+	var articles []MinimumArtilce
+	if err := a.db.Model(&article_model.Article{}).Select("title, summary, image, id").Find(&articles).Error; err != nil {
+		return nil, utils.NewError("could not retrive data", http.StatusInternalServerError)
+	}
+	// success
+	return articles, nil
 }
 
 func (a *ArticleStore) GetArticleById(id uint) (*Article, *types.CustomError) {
@@ -53,7 +57,7 @@ func (a *ArticleStore) GetArticleById(id uint) (*Article, *types.CustomError) {
 	return nil, nil
 }
 
-func (a *ArticleStore) GetArticlesByCategory(categoryId uint) ([]Article, *types.CustomError) {
+func (a *ArticleStore) GetArticlesByCategory(categoryId uint) ([]MinimumArtilce, *types.CustomError) {
 
 	return nil, nil
 }
@@ -68,7 +72,7 @@ func (a *ArticleStore) DeleteArticle(id uint) *types.CustomError {
 	return nil
 }
 
-func (a *ArticleStore) GetPopularArticles() ([]Article, *types.CustomError) {
+func (a *ArticleStore) GetPopularArticles() ([]MinimumArtilce, *types.CustomError) {
 
 	return nil, nil
 }

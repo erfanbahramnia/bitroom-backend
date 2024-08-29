@@ -22,9 +22,12 @@ func (a *ArticleService) AddArticle(data *NewArticle) (*Article, *types.CustomEr
 	return article, nil
 }
 
-func (a *ArticleService) GetArticles() ([]Article, *types.CustomError) {
-
-	return nil, nil
+func (a *ArticleService) GetArticles() ([]MinimumArtilce, *types.CustomError) {
+	articles, err := a.store.GetArticles()
+	if err != nil {
+		return nil, err
+	}
+	return articles, nil
 }
 
 func (a *ArticleService) GetArticleById(id uint) (*Article, *types.CustomError) {
@@ -32,7 +35,7 @@ func (a *ArticleService) GetArticleById(id uint) (*Article, *types.CustomError) 
 	return nil, nil
 }
 
-func (a *ArticleService) GetArticlesByCategory(categoryId uint) ([]Article, *types.CustomError) {
+func (a *ArticleService) GetArticlesByCategory(categoryId uint) ([]MinimumArtilce, *types.CustomError) {
 
 	return nil, nil
 }
@@ -47,7 +50,7 @@ func (a *ArticleService) DeleteArticle(id uint) *types.CustomError {
 	return nil
 }
 
-func (a *ArticleService) GetPopularArticles() ([]Article, *types.CustomError) {
+func (a *ArticleService) GetPopularArticles() ([]MinimumArtilce, *types.CustomError) {
 
 	return nil, nil
 }

@@ -11,12 +11,19 @@ type UserComment struct {
 }
 
 type Article struct {
-	Title       string
-	Description string
-	Summary     string
-	Status      string
-	Image       string
-	ID          uint
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Summary     string `json:"summary"`
+	Status      string `json:"status"`
+	Image       string `json:"image"`
+	ID          uint   `json:"id"`
+}
+
+type MinimumArtilce struct {
+	Title   string `json:"title"`
+	Summary string `json:"summary"`
+	Image   string `json:"image"`
+	ID      uint   `json:"id"`
 }
 
 type ArticleComment struct {

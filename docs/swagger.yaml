@@ -122,6 +122,14 @@ paths:
       responses: {}
       tags:
       - articles
+  /article/all:
+    get:
+      description: get all articles
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - articles
   /auth/login:
     post:
       consumes:

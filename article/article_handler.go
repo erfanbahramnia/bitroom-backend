@@ -21,6 +21,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group := ech.Group("article")
 
 	group.POST("/add", a.AddArticle)
+	group.GET("/all", a.GetArticles)
 }
 
 // AddArticle godoc
@@ -68,5 +69,19 @@ func (a *ArticleHandler) AddArticle(ctx echo.Context) error {
 	// success
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"article": InsertedData,
+	})
+}
+
+// @Description get all articles
+// @Tags articles
+// @Produce json
+// @Router /article/all [get]
+func (a *ArticleHandler) GetArticles(ctx echo.Context) error {
+	articles, err := a.service.GetArticles()
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"articles": articles,
 	})
 }
