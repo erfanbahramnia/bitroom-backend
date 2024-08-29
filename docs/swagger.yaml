@@ -156,6 +156,23 @@ paths:
       tags:
       - auth
   /category/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Delete Category By Id
+      tags:
+      - category
     get:
       consumes:
       - application/json

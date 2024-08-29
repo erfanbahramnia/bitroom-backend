@@ -27,6 +27,7 @@ func (c *CategoryHandler) InitHandler(ech *echo.Echo) {
 	group.GET("/all", c.GetCategories)
 	group.GET("/tree", c.GetCategoriesTree)
 	group.PUT("/:id/:name", c.EditCategory)
+	group.DELETE("/:id", c.DeleteCategory)
 }
 
 // @Summary Add Category
@@ -164,6 +165,26 @@ func (c *CategoryHandler) EditCategory(ctx echo.Context) error {
 
 // --------------------------------------------------------------------------------------------------------
 
+// @Summary Delete Category By Id
+// @Tags category
+// @Accept json
+// @Produce json
+// @Param id path int true "Category ID"
+// @Success 201
+// @Router /category/{id} [delete]
 func (c *CategoryHandler) DeleteCategory(ctx echo.Context) error {
-	return nil
+	// get id
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil || id < 1 {
+		return echo.NewHTTPError(http.StatusBadRequest, constants.ProvideId)
+	}
+	// delete
+	deleteErr := c.service.DeleteCategory(uint(id))
+	if deleteErr != nil {
+		return echo.NewHTTPError(deleteErr.Code, deleteErr.Message)
+	}
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "successful",
+	})
 }

@@ -83,7 +83,38 @@ func (c *CategoryStore) EditCategory(data EditCategory) *types.CustomError {
 // --------------------------------------------------------------------------------------------------------
 
 func (c *CategoryStore) DeleteCategory(id uint) *types.CustomError {
-
+	// check category exist
+	exists, err := c.CheckCategoryExist(id)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
+	}
+	// get all children
+	var categories []category_model.Category
+	query := `
+		WITH RECURSIVE category_tree AS (
+			SELECT * FROM categories WHERE id = ?
+			UNION ALL
+			SELECT c.* FROM categories c
+			INNER JOIN category_tree ct ON ct.id = c.parent_id
+		)
+		SELECT * FROM category_tree;
+	`
+	if err := c.db.Raw(query, id).Scan(&categories).Error; err != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// get ids
+	var ids []uint
+	for _, category := range categories {
+		ids = append(ids, category.ID)
+	}
+	// delete categories
+	if err := c.db.Delete(&category_model.Category{}, ids).Error; err != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// success
 	return nil
 }
 

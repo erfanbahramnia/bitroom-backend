@@ -10,4 +10,5 @@ const (
 	UserHasNotPassword  = "user does not set password already"
 	NotFound            = "item not found"
 	ProvideId           = "please provide id"
+	CouldNotDeleteItem  = "Could not delete item"
 )

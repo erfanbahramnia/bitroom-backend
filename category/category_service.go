@@ -50,7 +50,10 @@ func (c *CategoryService) EditCategory(data EditCategory) *types.CustomError {
 }
 
 func (c *CategoryService) DeleteCategory(id uint) *types.CustomError {
-
+	err := c.store.DeleteCategory(id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
