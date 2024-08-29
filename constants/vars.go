@@ -8,3 +8,4 @@ const Numbers = "0123456789"
 const OtpLength = 5
 const CacheItemTimeExpiration = 3 * time.Minute
 const CachePurgesTimeExpiratoin = 5 * time.Minute
+const StaticFolderName = "public"

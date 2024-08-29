@@ -91,6 +91,37 @@ definitions:
 info:
   contact: {}
 paths:
+  /article/add:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an article along with an image
+      parameters:
+      - description: Article Title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Article Description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Article Summary
+        in: formData
+        name: summary
+        required: true
+        type: string
+      - description: Article Image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - articles
   /auth/login:
     post:
       consumes:

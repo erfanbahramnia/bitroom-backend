@@ -21,6 +21,8 @@ func main() {
 
 	ech.Use(middleware.SetCsrfTokenMiddleware) // implement csrf
 
+	ech.Static("/", "public") // static folder
+
 	ech.GET("/api/*", echoSwagger.WrapHandler) // add swagger
 
 	port := fmt.Sprintf(":%s", config.ServerConfig.Port)

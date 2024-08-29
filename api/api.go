@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bitroom/article"
 	"bitroom/auth"
 	"bitroom/category"
 
@@ -24,6 +25,12 @@ func InitApi(db *gorm.DB, ech *echo.Echo, port string) {
 	categoryService := category.NewCategoryService(categoryStore)
 	categoryHandler := category.NewCategoryHandler(categoryService)
 	categoryHandler.InitHandler(ech)
+
+	// article apis
+	articleStore := article.NewArticleStore(db)
+	articleService := article.NewArticleService(articleStore)
+	articleHandler := article.NewArticleHandler(articleService)
+	articleHandler.InitHandler(ech)
 
 	// start server
 	ech.Logger.Fatal(ech.Start(port))
