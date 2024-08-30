@@ -16,6 +16,7 @@ type Article struct {
 	Properties  []ArticleProperty       `gorm:"foreignKey:ArticleID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Comments    []ArticleComment        `gorm:"foreignKey:ArticleID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Category    category_model.Category `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CategoryID  uint                    `gorm:"not null"`
 }
 
 type ArticleComment struct {

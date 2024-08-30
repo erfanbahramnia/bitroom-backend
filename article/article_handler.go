@@ -24,6 +24,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group.POST("/add", a.AddArticle)
 	group.GET("/all", a.GetArticles)
 	group.GET("/:id", a.GetArticleById)
+	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
 	group.DELETE("/:id", a.DeleteArticleById)
 }
 
@@ -151,3 +152,26 @@ func (a *ArticleHandler) DeleteArticleById(ctx echo.Context) error {
 }
 
 // --------------------------------------------------------------------------------------------------------------------
+
+// @Summary Get Articles By category
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param categoryId path int true "Category ID"
+// @Success 201
+// @Router /article/byCategory/{categoryId} [get]
+func (a *ArticleHandler) GetArticlesByCategory(ctx echo.Context) error {
+	categoryId, ParsingErr := strconv.ParseUint(ctx.Param("categoryId"), 10, 64)
+	if ParsingErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "please upload valid id")
+	}
+	// get articles
+	articles, err := a.service.GetArticlesByCategory(uint(categoryId))
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"articles": articles,
+	})
+}

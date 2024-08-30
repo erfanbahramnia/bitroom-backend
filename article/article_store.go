@@ -27,9 +27,6 @@ func (a *ArticleStore) AddArticle(data *NewArticle) (*Article, *types.CustomErro
 	// get category
 	var category category_model.Category
 	if err := a.db.Find(&category, data.Category).Error; err != nil {
-		if err != gorm.ErrRecordNotFound {
-			return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
-		}
 		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
 	}
 	// save article
@@ -56,8 +53,8 @@ func (a *ArticleStore) AddArticle(data *NewArticle) (*Article, *types.CustomErro
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) GetArticles() ([]MinimumArtilce, *types.CustomError) {
-	var articles []MinimumArtilce
+func (a *ArticleStore) GetArticles() ([]MinimumArticle, *types.CustomError) {
+	var articles []MinimumArticle
 	if err := a.db.Model(&article_model.Article{}).Select("title, summary, image, id").Find(&articles).Error; err != nil {
 		return nil, utils.NewError("could not retrive data", http.StatusInternalServerError)
 	}
@@ -68,14 +65,6 @@ func (a *ArticleStore) GetArticles() ([]MinimumArtilce, *types.CustomError) {
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleStore) GetArticleById(id uint) (*article_model.Article, *types.CustomError) {
-	// check article exist
-	exists, checkingErr := a.CheckArticleExist(id)
-	if checkingErr != nil {
-		return nil, checkingErr
-	}
-	if !exists {
-		return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
-	}
 	// get article
 	var article article_model.Article
 	err := a.db.Preload("Properties").Preload("Comments").Preload("Category").First(&article, id).Error
@@ -88,9 +77,33 @@ func (a *ArticleStore) GetArticleById(id uint) (*article_model.Article, *types.C
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) GetArticlesByCategory(categoryId uint) ([]MinimumArtilce, *types.CustomError) {
+func (a *ArticleStore) GetArticlesByCategory(categoryId uint) ([]MinimumArticle, *types.CustomError) {
+	// recursive query for getting all children of selected category
+	recursiveQuery := `
+		WITH RECURSIVE category_tree as (
+			SELECT * FROM categories WHERE id = ?
+			UNION ALL
+			SELECT c.* FROM categories c
+			INNER JOIN category_tree ct ON ct.id = c.Parent_id
+		)
+		SELECT id FROM category_tree;
+	`
+	var ids []uint
+	if err := a.db.Model(&category_model.Category{}).Raw(recursiveQuery, categoryId).Select("id").Scan(&ids).Error; err != nil {
+		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
 
-	return nil, nil
+	// get articles
+	var articles []MinimumArticle
+	if err := a.db.Model(&article_model.Article{}).
+		Select("articles.title, articles.summary, articles.image, articles.id").
+		Joins("LEFT JOIN categories ON categories.id = articles.category_id").
+		Where("categories.id IN ?", ids).
+		Scan(&articles).Error; err != nil {
+		return nil, utils.NewError("could not retrive data", http.StatusInternalServerError)
+	}
+	// success
+	return articles, nil
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,14 +116,6 @@ func (a *ArticleStore) EditArticle() (*Article, *types.CustomError) {
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleStore) DeleteArticle(id uint) *types.CustomError {
-	// check article exist
-	exists, checkingErr := a.CheckArticleExist(id)
-	if checkingErr != nil {
-		return checkingErr
-	}
-	if !exists {
-		return utils.NewError(constants.NotFound, http.StatusNotFound)
-	}
 	// delete
 	if err := a.db.Delete(&article_model.Article{}, id).Error; err != nil {
 		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
@@ -121,7 +126,7 @@ func (a *ArticleStore) DeleteArticle(id uint) *types.CustomError {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) GetPopularArticles() ([]MinimumArtilce, *types.CustomError) {
+func (a *ArticleStore) GetPopularArticles() ([]MinimumArticle, *types.CustomError) {
 
 	return nil, nil
 }
@@ -174,5 +179,16 @@ func (a *ArticleStore) CheckArticleExist(id uint) (bool, *types.CustomError) {
 		return false, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
 	}
 
+	return exists, nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (c *ArticleStore) CheckCategoryExist(id uint) (bool, *types.CustomError) {
+	var exists bool
+	err := c.db.Model(&category_model.Category{}).Select("count(*) > 0").Where("ID = ?", id).Scan(&exists).Error
+	if err != nil {
+		return false, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
 	return exists, nil
 }

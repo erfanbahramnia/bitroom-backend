@@ -170,6 +170,24 @@ paths:
       responses: {}
       tags:
       - articles
+  /article/byCategory/{categoryId}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Get Articles By category
+      tags:
+      - articles
   /auth/login:
     post:
       consumes:

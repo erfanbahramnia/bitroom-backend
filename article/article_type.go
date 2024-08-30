@@ -20,7 +20,7 @@ type Article struct {
 	ID          uint   `json:"id"`
 }
 
-type MinimumArtilce struct {
+type MinimumArticle struct {
 	Title   string `json:"title"`
 	Summary string `json:"summary"`
 	Image   string `json:"image"`
