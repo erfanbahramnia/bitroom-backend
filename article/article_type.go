@@ -20,6 +20,16 @@ type Article struct {
 	ID          uint   `json:"id"`
 }
 
+type EditArticle struct {
+	Title       *string `json:"title" form:"title"`
+	Description *string `json:"description" form:"description"`
+	Summary     *string `json:"summary" form:"summary"`
+	Status      *string `json:"status" form:"status"`
+	Image       *string `json:"image" form:"image"`
+	Category    *uint   `json:"category" form:"category"`
+	Id          *uint   `json:"id" form:"id"`
+}
+
 type MinimumArticle struct {
 	Title   string `json:"title"`
 	Summary string `json:"summary"`

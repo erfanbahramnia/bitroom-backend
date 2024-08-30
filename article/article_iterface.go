@@ -2,6 +2,7 @@ package article
 
 import (
 	article_model "bitroom/models/article"
+	category_model "bitroom/models/category"
 	"bitroom/types"
 )
 
@@ -10,7 +11,7 @@ type ArticleStoreInterface interface {
 	GetArticles() ([]MinimumArticle, *types.CustomError)
 	GetArticleById(id uint) (*article_model.Article, *types.CustomError)
 	GetArticlesByCategory(categoryId uint) ([]MinimumArticle, *types.CustomError)
-	EditArticle() (*Article, *types.CustomError)
+	EditArticle(*EditArticle) *types.CustomError
 	DeleteArticle(id uint) *types.CustomError
 	GetPopularArticles() ([]MinimumArticle, *types.CustomError)
 	LikeArticle(userId, articleId uint) *types.CustomError
@@ -20,6 +21,7 @@ type ArticleStoreInterface interface {
 	DeleteArticleComment(userId, commentId uint) *types.CustomError
 	CheckArticleExist(id uint) (bool, *types.CustomError)
 	CheckCategoryExist(id uint) (bool, *types.CustomError)
+	GetCategory(id uint) (*category_model.Category, *types.CustomError)
 }
 
 type ArticleServiceInterface interface {
@@ -27,7 +29,7 @@ type ArticleServiceInterface interface {
 	GetArticles() ([]MinimumArticle, *types.CustomError)
 	GetArticleById(id uint) (*article_model.Article, *types.CustomError)
 	GetArticlesByCategory(categoryId uint) ([]MinimumArticle, *types.CustomError)
-	EditArticle() (*Article, *types.CustomError)
+	EditArticle(*EditArticle) *types.CustomError
 	DeleteArticle(id uint) *types.CustomError
 	GetPopularArticles() ([]MinimumArticle, *types.CustomError)
 	LikeArticle(userId, articleId uint) *types.CustomError

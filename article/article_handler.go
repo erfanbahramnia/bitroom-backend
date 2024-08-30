@@ -26,6 +26,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group.GET("/:id", a.GetArticleById)
 	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
 	group.DELETE("/:id", a.DeleteArticleById)
+	group.PUT("/edit", a.EditArticle)
 }
 
 // AddArticle godoc
@@ -173,5 +174,65 @@ func (a *ArticleHandler) GetArticlesByCategory(ctx echo.Context) error {
 	// success
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"articles": articles,
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Description Edit an article
+// @Tags articles
+// @Accept multipart/form-data
+// @Produce json
+// @Param title formData string false "Article Title"
+// @Param description formData string false "Article Description"
+// @Param summary formData string false "Article Summary"
+// @Param category formData string false "Article Category"
+// @Param status formData string false "Article Status"
+// @Param id formData string false "Article id"
+// @Param image formData file false "Article Image"
+// @Router /article/edit [put]
+func (a *ArticleHandler) EditArticle(ctx echo.Context) error {
+	var editedArticle EditArticle
+
+	// get article id
+	// Bind form data to struct
+	if err := ctx.Bind(&editedArticle); err != nil {
+		return ctx.JSON(http.StatusBadRequest, echo.Map{
+			"message": "Invalid input",
+			"error":   err.Error(),
+		})
+	}
+
+	// save file if sended
+	if file, err := ctx.FormFile("image"); file != nil {
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get image")
+		}
+		uploadPath, uploadErr := utils.HanldeFileUpload(file)
+		if uploadErr != nil {
+			return echo.NewHTTPError(uploadErr.Code, uploadErr.Message)
+		}
+		editedArticle.Image = &uploadPath
+	}
+
+	// check any data sended for update
+	if editedArticle.Title == nil &&
+		editedArticle.Description == nil &&
+		editedArticle.Summary == nil &&
+		editedArticle.Status == nil &&
+		editedArticle.Category == nil &&
+		editedArticle.Image == nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "please upload any data for update")
+	}
+
+	// update
+	err := a.service.EditArticle(&editedArticle)
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "updated successfully",
 	})
 }

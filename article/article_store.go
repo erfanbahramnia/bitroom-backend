@@ -21,13 +21,22 @@ func NewArticleStore(db *gorm.DB) *ArticleStore {
 	}
 }
 
+func (a *ArticleStore) GetCategory(id uint) (*category_model.Category, *types.CustomError) {
+	// get category
+	var category category_model.Category
+	if err := a.db.Find(&category, id).Error; err != nil {
+		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	return &category, nil
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleStore) AddArticle(data *NewArticle) (*Article, *types.CustomError) {
 	// get category
-	var category category_model.Category
-	if err := a.db.Find(&category, data.Category).Error; err != nil {
-		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	category, err := a.GetCategory(data.Category)
+	if err != nil {
+		return nil, err
 	}
 	// save article
 	article := article_model.Article{
@@ -35,7 +44,7 @@ func (a *ArticleStore) AddArticle(data *NewArticle) (*Article, *types.CustomErro
 		Description: data.Description,
 		Summary:     data.Summary,
 		Image:       data.Image,
-		Category:    category,
+		Category:    *category,
 	}
 	if err := a.db.Create(&article).Error; err != nil {
 		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
@@ -108,9 +117,44 @@ func (a *ArticleStore) GetArticlesByCategory(categoryId uint) ([]MinimumArticle,
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) EditArticle() (*Article, *types.CustomError) {
+func (a *ArticleStore) EditArticle(editedArticle *EditArticle) *types.CustomError {
+	article := article_model.Article{}
+	// get article
+	if err := a.db.First(&article, *editedArticle.Id).Error; err != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
 
-	return nil, nil
+	// update
+	if editedArticle.Title != nil {
+		article.Title = *editedArticle.Title
+	}
+	if editedArticle.Description != nil {
+		article.Description = *editedArticle.Description
+	}
+	if editedArticle.Summary != nil {
+		article.Summary = *editedArticle.Summary
+	}
+	if editedArticle.Status != nil {
+		article.Status = *editedArticle.Status
+	}
+	if editedArticle.Image != nil {
+		article.Image = *editedArticle.Image
+	}
+	if editedArticle.Category != nil {
+		// get category
+		category, err := a.GetCategory(*editedArticle.Category)
+		if err != nil {
+			return err
+		}
+		article.Category = *category
+	}
+
+	// save changes
+	if err := a.db.Save(&article).Error; err != nil {
+		return utils.NewError("failed to update", http.StatusInternalServerError)
+	}
+	// success
+	return nil
 }
 
 // --------------------------------------------------------------------------------------------------------------------

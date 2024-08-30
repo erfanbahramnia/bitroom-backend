@@ -87,9 +87,29 @@ func (a *ArticleService) GetArticlesByCategory(categoryId uint) ([]MinimumArticl
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleService) EditArticle() (*Article, *types.CustomError) {
-
-	return nil, nil
+func (a *ArticleService) EditArticle(article *EditArticle) *types.CustomError {
+	// check article exists
+	exists, err := a.store.CheckArticleExist(*article.Id)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
+	}
+	// check category exists
+	if article.Category != nil {
+		exists, existsErr := a.store.CheckCategoryExist(*article.Category)
+		if existsErr != nil {
+			return existsErr
+		}
+		if !exists {
+			return utils.NewError(constants.NotFound, http.StatusNotFound)
+		}
+	}
+	// update
+	err = a.store.EditArticle(article)
+	// success
+	return err
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,6 +123,8 @@ func (a *ArticleService) DeleteArticle(id uint) *types.CustomError {
 	if !exists {
 		return utils.NewError(constants.NotFound, http.StatusNotFound)
 	}
+	// delete images of article
+
 	// delete article
 	err := a.store.DeleteArticle(id)
 	if err != nil {
