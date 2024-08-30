@@ -3,6 +3,7 @@ package article
 import (
 	"bitroom/utils"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,6 +23,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 
 	group.POST("/add", a.AddArticle)
 	group.GET("/all", a.GetArticles)
+	group.GET("/:id", a.GetArticleById)
 }
 
 // AddArticle godoc
@@ -83,5 +85,28 @@ func (a *ArticleHandler) GetArticles(ctx echo.Context) error {
 	}
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"articles": articles,
+	})
+}
+
+// @Summary Get Article By Id
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param id path int true "Article ID"
+// @Success 201
+// @Router /article/{id} [get]
+func (a *ArticleHandler) GetArticleById(ctx echo.Context) error {
+	id, ParsingErr := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if ParsingErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "please upload valid id")
+	}
+
+	article, err := a.service.GetArticleById(uint(id))
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"article": article,
 	})
 }

@@ -52,9 +52,17 @@ func (a *ArticleStore) GetArticles() ([]MinimumArtilce, *types.CustomError) {
 	return articles, nil
 }
 
-func (a *ArticleStore) GetArticleById(id uint) (*Article, *types.CustomError) {
-
-	return nil, nil
+func (a *ArticleStore) GetArticleById(id uint) (*article_model.Article, *types.CustomError) {
+	// get article
+	var article *article_model.Article
+	err := a.db.Preload("Properties").Preload("Comments").Find(&article, id).Error
+	if err != nil {
+		if err != gorm.ErrRecordNotFound {
+			return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
+		}
+		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	return article, nil
 }
 
 func (a *ArticleStore) GetArticlesByCategory(categoryId uint) ([]MinimumArtilce, *types.CustomError) {

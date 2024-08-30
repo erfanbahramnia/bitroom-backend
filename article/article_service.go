@@ -1,6 +1,7 @@
 package article
 
 import (
+	article_model "bitroom/models/article"
 	"bitroom/types"
 )
 
@@ -30,9 +31,12 @@ func (a *ArticleService) GetArticles() ([]MinimumArtilce, *types.CustomError) {
 	return articles, nil
 }
 
-func (a *ArticleService) GetArticleById(id uint) (*Article, *types.CustomError) {
-
-	return nil, nil
+func (a *ArticleService) GetArticleById(id uint) (*article_model.Article, *types.CustomError) {
+	article, err := a.store.GetArticleById(id)
+	if err != nil {
+		return nil, err
+	}
+	return article, nil
 }
 
 func (a *ArticleService) GetArticlesByCategory(categoryId uint) ([]MinimumArtilce, *types.CustomError) {

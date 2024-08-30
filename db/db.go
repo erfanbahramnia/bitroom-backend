@@ -24,7 +24,15 @@ func InitDb() *gorm.DB {
 		log.Fatal("could not connect db...")
 	}
 
-	db.AutoMigrate(&user_model.User{}, &article_model.Article{}, &news_model.News{}, &course_model.Course{}, &category_model.Category{})
+	db.AutoMigrate(
+		&user_model.User{},
+		&article_model.Article{},
+		&article_model.ArticleProperty{},
+		&article_model.ArticleComment{},
+		&news_model.News{},
+		&course_model.Course{},
+		&category_model.Category{},
+	)
 	// success
 	return db
 }
