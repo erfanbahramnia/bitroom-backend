@@ -5,6 +5,7 @@ type NewArticle struct {
 	Description string `json:"description" validate:"required"`
 	Summary     string `json:"summary" validate:"required"`
 	Image       string `json:"-"`
+	Category    uint   `json:"category" validate:"required,gt=0"`
 }
 
 type UserComment struct {

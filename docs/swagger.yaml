@@ -92,6 +92,23 @@ info:
   contact: {}
 paths:
   /article/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Delete Article By Id
+      tags:
+      - articles
     get:
       consumes:
       - application/json
@@ -128,6 +145,11 @@ paths:
       - description: Article Summary
         in: formData
         name: summary
+        required: true
+        type: string
+      - description: Article Category
+        in: formData
+        name: category
         required: true
         type: string
       - description: Article Image
