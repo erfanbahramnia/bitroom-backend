@@ -22,6 +22,9 @@ type ArticleStoreInterface interface {
 	CheckArticleExist(id uint) (bool, *types.CustomError)
 	CheckCategoryExist(id uint) (bool, *types.CustomError)
 	GetCategory(id uint) (*category_model.Category, *types.CustomError)
+	AddArticleProperty(data *ArticleProperty) *types.CustomError
+	EditArticleProperty(data *ArticleProperty) *types.CustomError
+	DeleteArticleProperty(data *ArticleProperty) *types.CustomError
 }
 
 type ArticleServiceInterface interface {
@@ -37,4 +40,7 @@ type ArticleServiceInterface interface {
 	AddCommentToArticle(data *UserComment) *types.CustomError
 	EditArticleComment(data *UserComment, commentId uint) (*ArticleComment, *types.CustomError)
 	DeleteArticleComment(userId, commentId uint) *types.CustomError
+	AddArticleProperty(data *ArticleProperty) *types.CustomError
+	EditArticleProperty(data *ArticleProperty) *types.CustomError
+	DeleteArticleProperty(data *ArticleProperty) *types.CustomError
 }

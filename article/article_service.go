@@ -136,6 +136,36 @@ func (a *ArticleService) DeleteArticle(id uint) *types.CustomError {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+func (a *ArticleService) AddArticleProperty(data *ArticleProperty) *types.CustomError {
+	// check article exists
+	exists, err := a.store.CheckArticleExist(data.ArticleID)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return utils.NewError("article not found", http.StatusNotFound)
+	}
+	// add property
+	err = a.store.AddArticleProperty(data)
+	return err
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleService) EditArticleProperty(data *ArticleProperty) *types.CustomError {
+
+	return nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleService) DeleteArticleProperty(data *ArticleProperty) *types.CustomError {
+
+	return nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 func (a *ArticleService) GetPopularArticles() ([]MinimumArticle, *types.CustomError) {
 
 	return nil, nil

@@ -28,7 +28,7 @@ type ArticleComment struct {
 
 type ArticleProperty struct {
 	gorm.Model
-	Text      string `gorm:"type:text;not null"`
-	Image     string `gorm:"type:varchar(255);default:''"`
-	ArticleID uint   `gorm:"not null"`
+	Description string `gorm:"type:text;not null;column:description"`
+	Image       string `gorm:"type:varchar(255);default:''"`
+	ArticleID   uint   `gorm:"not null"`
 }

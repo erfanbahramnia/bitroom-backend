@@ -170,6 +170,35 @@ func (a *ArticleStore) DeleteArticle(id uint) *types.CustomError {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+func (a *ArticleStore) AddArticleProperty(data *ArticleProperty) *types.CustomError {
+	// add new property
+	property := article_model.ArticleProperty{
+		Image:       *data.Image,
+		Description: data.Description,
+		ArticleID:   data.ArticleID,
+	}
+	if err := a.db.Create(&property).Error; err != nil {
+		return utils.NewError("could not add new property", http.StatusInternalServerError)
+	}
+	return nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) EditArticleProperty(data *ArticleProperty) *types.CustomError {
+
+	return nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) DeleteArticleProperty(data *ArticleProperty) *types.CustomError {
+
+	return nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 func (a *ArticleStore) GetPopularArticles() ([]MinimumArticle, *types.CustomError) {
 
 	return nil, nil

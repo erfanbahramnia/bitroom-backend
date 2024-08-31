@@ -15,6 +15,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/article/add": {
+            "post": {
+                "description": "Upload an article along with an image",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article Title",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article Description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article Summary",
+                        "name": "summary",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article Category",
+                        "name": "category",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Article Image",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/article/all": {
             "get": {
                 "description": "get all articles",
@@ -112,50 +164,77 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {}
-            },
+            }
+        },
+        "/article/property/add": {
             "post": {
-                "description": "Upload an article along with an image",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "articles"
                 ],
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Article Title",
-                        "name": "title",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Article Description",
+                        "description": "Property description",
                         "name": "description",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
-                        "type": "string",
-                        "description": "Article Summary",
-                        "name": "summary",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Article Category",
-                        "name": "category",
+                        "type": "integer",
+                        "description": "Article id",
+                        "name": "article_id",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "file",
-                        "description": "Article Image",
+                        "description": "Property image",
+                        "name": "image",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/article/property/delete": {
+            "delete": {
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Property description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Property image",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/article/property/edit": {
+            "put": {
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Property description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Property image",
                         "name": "image",
                         "in": "formData",
                         "required": true

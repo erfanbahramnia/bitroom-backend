@@ -27,6 +27,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
 	group.DELETE("/:id", a.DeleteArticleById)
 	group.PUT("/edit", a.EditArticle)
+	group.POST("/property/add", a.AddArticleProperty)
 }
 
 // AddArticle godoc
@@ -234,5 +235,86 @@ func (a *ArticleHandler) EditArticle(ctx echo.Context) error {
 	// success
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"msg": "updated successfully",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Tags articles
+// Accept multipart/form-data
+// @Product json
+// @Param description formData string false "Property description"
+// @Param article_id formData uint true "Article id"
+// @Param image formData file false "Property image"
+// @Router /article/property/add [post]
+func (a *ArticleHandler) AddArticleProperty(ctx echo.Context) error {
+	var property ArticleProperty
+	// bind json to struct
+	if err := ctx.Bind(&property); err != nil {
+		return ctx.JSON(http.StatusBadRequest, echo.Map{
+			"message": "Invalid input",
+			"error":   err.Error(),
+		})
+	}
+
+	// validate
+	vs := utils.GetValidator()
+	vsErr := vs.Validate(property)
+	if len(vsErr) > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"errors": vsErr,
+		})
+	}
+
+	// save file
+	file, fileErr := ctx.FormFile("image")
+	if fileErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "upload image")
+	}
+	uploadPath, err := utils.HanldeFileUpload(file)
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+	property.Image = &uploadPath
+
+	// add property
+	err = a.service.AddArticleProperty(&property)
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"message": "ok",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Tags articles
+// Accept multipart/form-data
+// @Product json
+// @Param description formData string true "Property description"
+// @Param image formData file true "Property image"
+// @Router /article/property/edit [put]
+func (a *ArticleHandler) EditArticleProperty(ctx echo.Context) error {
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"message": "ok",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Tags articles
+// Accept multipart/form-data
+// @Product json
+// @Param description formData string true "Property description"
+// @Param image formData file true "Property image"
+// @Router /article/property/delete [delete]
+func (a *ArticleHandler) DeleteArticleProperty(ctx echo.Context) error {
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"message": "ok",
 	})
 }

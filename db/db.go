@@ -24,7 +24,7 @@ func InitDb() *gorm.DB {
 		log.Fatal("could not connect db...")
 	}
 
-	db.AutoMigrate(
+	if err := db.AutoMigrate(
 		&user_model.User{},
 		&article_model.Article{},
 		&article_model.ArticleProperty{},
@@ -32,7 +32,9 @@ func InitDb() *gorm.DB {
 		&news_model.News{},
 		&course_model.Course{},
 		&category_model.Category{},
-	)
+	); err != nil {
+		log.Fatal(err)
+	}
 	// success
 	return db
 }

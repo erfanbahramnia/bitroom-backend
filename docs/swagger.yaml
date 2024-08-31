@@ -126,33 +126,7 @@ paths:
       summary: Get Article By Id
       tags:
       - articles
-  /article/all:
-    get:
-      description: get all articles
-      produces:
-      - application/json
-      responses: {}
-      tags:
-      - articles
-  /article/byCategory/{categoryId}:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: Category ID
-        in: path
-        name: categoryId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-      summary: Get Articles By category
-      tags:
-      - articles
-  /article/edit:
+  /article/add:
     post:
       consumes:
       - multipart/form-data
@@ -188,6 +162,33 @@ paths:
       responses: {}
       tags:
       - articles
+  /article/all:
+    get:
+      description: get all articles
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - articles
+  /article/byCategory/{categoryId}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Get Articles By category
+      tags:
+      - articles
+  /article/edit:
     put:
       consumes:
       - multipart/form-data
@@ -223,6 +224,57 @@ paths:
         type: file
       produces:
       - application/json
+      responses: {}
+      tags:
+      - articles
+  /article/property/add:
+    post:
+      parameters:
+      - description: Property description
+        in: formData
+        name: description
+        type: string
+      - description: Article id
+        in: formData
+        name: article_id
+        required: true
+        type: integer
+      - description: Property image
+        in: formData
+        name: image
+        type: file
+      responses: {}
+      tags:
+      - articles
+  /article/property/delete:
+    delete:
+      parameters:
+      - description: Property description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Property image
+        in: formData
+        name: image
+        required: true
+        type: file
+      responses: {}
+      tags:
+      - articles
+  /article/property/edit:
+    put:
+      parameters:
+      - description: Property description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Property image
+        in: formData
+        name: image
+        required: true
+        type: file
       responses: {}
       tags:
       - articles

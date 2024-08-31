@@ -8,6 +8,12 @@ type NewArticle struct {
 	Category    uint   `json:"category" validate:"required,gt=0"`
 }
 
+type ArticleProperty struct {
+	ArticleID   uint    `json:"article_id" form:"article_id" validate:"required"`
+	Description string  `json:"description" form:"description" validate:"required,min=10"`
+	Image       *string `json:"image" form:"image"`
+}
+
 type UserComment struct {
 }
 
