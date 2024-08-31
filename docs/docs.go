@@ -205,13 +205,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Property description",
                         "name": "description",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "integer",
                         "description": "Article id",
-                        "name": "article_id",
+                        "name": "property_id",
                         "in": "formData",
                         "required": true
                     },
@@ -219,8 +218,7 @@ const docTemplate = `{
                         "type": "file",
                         "description": "Property image",
                         "name": "image",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {}

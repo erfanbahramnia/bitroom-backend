@@ -263,17 +263,15 @@ paths:
       - description: Property description
         in: formData
         name: description
-        required: true
         type: string
       - description: Article id
         in: formData
-        name: article_id
+        name: property_id
         required: true
         type: integer
       - description: Property image
         in: formData
         name: image
-        required: true
         type: file
       responses: {}
       tags:

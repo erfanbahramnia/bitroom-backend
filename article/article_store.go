@@ -185,7 +185,25 @@ func (a *ArticleStore) AddArticleProperty(data *ArticleProperty) *types.CustomEr
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) EditArticleProperty(data *ArticleProperty) *types.CustomError {
+func (a *ArticleStore) EditArticleProperty(data *EditArticleProperty) *types.CustomError {
+	var property article_model.ArticleProperty
+	if err := a.db.First(&property, data.PropertyID).Error; err != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+
+	// update
+	if data.Description != nil {
+		property.Description = *data.Description
+	}
+	if data.Image != nil {
+		property.Image = *data.Image
+	}
+
+	// save changes
+	if err := a.db.Save(property).Error; err != nil {
+		return utils.NewError("failed to update", http.StatusInternalServerError)
+	}
+	// success
 	return nil
 }
 

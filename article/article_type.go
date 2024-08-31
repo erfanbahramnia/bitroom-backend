@@ -14,6 +14,12 @@ type ArticleProperty struct {
 	Image       *string `json:"image" form:"image"`
 }
 
+type EditArticleProperty struct {
+	PropertyID  uint    `json:"property_id" form:"property_id"`
+	Description *string `json:"description" form:"description"`
+	Image       *string `json:"image" form:"image"`
+}
+
 type UserComment struct {
 }
 

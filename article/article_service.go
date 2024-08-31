@@ -152,9 +152,18 @@ func (a *ArticleService) AddArticleProperty(data *ArticleProperty) *types.Custom
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleService) EditArticleProperty(data *ArticleProperty) *types.CustomError {
-
-	return nil
+func (a *ArticleService) EditArticleProperty(data *EditArticleProperty) *types.CustomError {
+	// check property exists
+	exists, err := a.store.CheckPropertyExists(data.PropertyID)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
+	}
+	// edit
+	err = a.store.EditArticleProperty(data)
+	return err
 }
 
 // --------------------------------------------------------------------------------------------------------------------

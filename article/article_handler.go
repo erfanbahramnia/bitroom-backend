@@ -30,6 +30,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
 
 	group.POST("/property/add", a.AddArticleProperty)
+	group.PUT("/property/edit", a.EditArticleProperty)
 	group.DELETE("/property/:propertyId", a.DeleteArticleProperty)
 }
 
@@ -297,12 +298,44 @@ func (a *ArticleHandler) AddArticleProperty(ctx echo.Context) error {
 // @Tags articles
 // Accept multipart/form-data
 // @Product json
-// @Param description formData string true "Property description"
+// @Param description formData string false "Property description"
 // @Param property_id formData uint true "Article id"
-// @Param image formData file true "Property image"
+// @Param image formData file false "Property image"
 // @Router /article/property/edit [put]
 func (a *ArticleHandler) EditArticleProperty(ctx echo.Context) error {
+	var propertyEdit EditArticleProperty
+	// bind form data to struct
+	if err := ctx.Bind(&propertyEdit); err != nil {
+		return ctx.JSON(http.StatusBadRequest, echo.Map{
+			"message": "Invalid input",
+			"error":   err.Error(),
+		})
+	}
 
+	// save file if has been sended
+	if file, err := ctx.FormFile("image"); file != nil {
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to get image")
+		}
+		uploadPath, uploadErr := utils.HanldeFileUpload(file)
+		if uploadErr != nil {
+			return echo.NewHTTPError(uploadErr.Code, uploadErr.Message)
+		}
+		propertyEdit.Image = &uploadPath
+	}
+
+	// check any data have been sended or not
+	if propertyEdit.Description == nil && propertyEdit.Image == nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "please upload any data for update")
+	}
+
+	// update
+	err := a.service.EditArticleProperty(&propertyEdit)
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"message": "ok",
 	})
