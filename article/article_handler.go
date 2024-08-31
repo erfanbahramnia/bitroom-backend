@@ -24,10 +24,13 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group.POST("/add", a.AddArticle)
 	group.GET("/all", a.GetArticles)
 	group.GET("/:id", a.GetArticleById)
-	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
-	group.DELETE("/:id", a.DeleteArticleById)
 	group.PUT("/edit", a.EditArticle)
+	group.DELETE("/:id", a.DeleteArticleById)
+
+	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
+
 	group.POST("/property/add", a.AddArticleProperty)
+	group.DELETE("/property/:propertyId", a.DeleteArticleProperty)
 }
 
 // AddArticle godoc
@@ -295,6 +298,7 @@ func (a *ArticleHandler) AddArticleProperty(ctx echo.Context) error {
 // Accept multipart/form-data
 // @Product json
 // @Param description formData string true "Property description"
+// @Param property_id formData uint true "Article id"
 // @Param image formData file true "Property image"
 // @Router /article/property/edit [put]
 func (a *ArticleHandler) EditArticleProperty(ctx echo.Context) error {
@@ -309,11 +313,21 @@ func (a *ArticleHandler) EditArticleProperty(ctx echo.Context) error {
 // @Tags articles
 // Accept multipart/form-data
 // @Product json
-// @Param description formData string true "Property description"
-// @Param image formData file true "Property image"
-// @Router /article/property/delete [delete]
+// @Param propertyId path int true "Property ID"
+// @Router /article/property/{propertyId} [delete]
 func (a *ArticleHandler) DeleteArticleProperty(ctx echo.Context) error {
+	// get id of property
+	propertyId, parsingErr := strconv.ParseUint(ctx.Param("propertyId"), 10, 64)
+	if parsingErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "please upload valid id")
+	}
+	// delete
+	err := a.service.DeleteArticleProperty(uint(propertyId))
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
 
+	// success
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"message": "ok",
 	})

@@ -159,9 +159,18 @@ func (a *ArticleService) EditArticleProperty(data *ArticleProperty) *types.Custo
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleService) DeleteArticleProperty(data *ArticleProperty) *types.CustomError {
-
-	return nil
+func (a *ArticleService) DeleteArticleProperty(id uint) *types.CustomError {
+	// check property exists
+	exists, err := a.store.CheckPropertyExists(id)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
+	}
+	// delete
+	err = a.store.DeleteArticleProperty(id)
+	return err
 }
 
 // --------------------------------------------------------------------------------------------------------------------

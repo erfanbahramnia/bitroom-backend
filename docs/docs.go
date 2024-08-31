@@ -195,30 +195,6 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/article/property/delete": {
-            "delete": {
-                "tags": [
-                    "articles"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Property description",
-                        "name": "description",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "Property image",
-                        "name": "image",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
         "/article/property/edit": {
             "put": {
                 "tags": [
@@ -233,10 +209,34 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "integer",
+                        "description": "Article id",
+                        "name": "article_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
                         "type": "file",
                         "description": "Property image",
                         "name": "image",
                         "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/article/property/{propertyId}": {
+            "delete": {
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Property ID",
+                        "name": "propertyId",
+                        "in": "path",
                         "required": true
                     }
                 ],

@@ -227,6 +227,17 @@ paths:
       responses: {}
       tags:
       - articles
+  /article/property/{propertyId}:
+    delete:
+      parameters:
+      - description: Property ID
+        in: path
+        name: propertyId
+        required: true
+        type: integer
+      responses: {}
+      tags:
+      - articles
   /article/property/add:
     post:
       parameters:
@@ -246,22 +257,6 @@ paths:
       responses: {}
       tags:
       - articles
-  /article/property/delete:
-    delete:
-      parameters:
-      - description: Property description
-        in: formData
-        name: description
-        required: true
-        type: string
-      - description: Property image
-        in: formData
-        name: image
-        required: true
-        type: file
-      responses: {}
-      tags:
-      - articles
   /article/property/edit:
     put:
       parameters:
@@ -270,6 +265,11 @@ paths:
         name: description
         required: true
         type: string
+      - description: Article id
+        in: formData
+        name: article_id
+        required: true
+        type: integer
       - description: Property image
         in: formData
         name: image

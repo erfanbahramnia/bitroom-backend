@@ -186,14 +186,15 @@ func (a *ArticleStore) AddArticleProperty(data *ArticleProperty) *types.CustomEr
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleStore) EditArticleProperty(data *ArticleProperty) *types.CustomError {
-
 	return nil
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) DeleteArticleProperty(data *ArticleProperty) *types.CustomError {
-
+func (a *ArticleStore) DeleteArticleProperty(id uint) *types.CustomError {
+	if err := a.db.Delete(&article_model.ArticleProperty{}, id).Error; err != nil {
+		return utils.NewError(constants.CouldNotDeleteItem, http.StatusInternalServerError)
+	}
 	return nil
 }
 
@@ -257,11 +258,25 @@ func (a *ArticleStore) CheckArticleExist(id uint) (bool, *types.CustomError) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (c *ArticleStore) CheckCategoryExist(id uint) (bool, *types.CustomError) {
+func (a *ArticleStore) CheckCategoryExist(id uint) (bool, *types.CustomError) {
 	var exists bool
-	err := c.db.Model(&category_model.Category{}).Select("count(*) > 0").Where("ID = ?", id).Scan(&exists).Error
+	err := a.db.Model(&category_model.Category{}).Select("count(*) > 0").Where("ID = ?", id).Scan(&exists).Error
 	if err != nil {
 		return false, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
 	}
 	return exists, nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) CheckPropertyExists(id uint) (bool, *types.CustomError) {
+	var exists bool
+	err := a.db.Model(&article_model.ArticleProperty{}).
+		Select("count(*) > 0").
+		Where("ID = ?", id).
+		Scan(&exists).Error
+	if err != nil {
+		return false, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	return true, nil
 }

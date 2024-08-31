@@ -24,7 +24,8 @@ type ArticleStoreInterface interface {
 	GetCategory(id uint) (*category_model.Category, *types.CustomError)
 	AddArticleProperty(data *ArticleProperty) *types.CustomError
 	EditArticleProperty(data *ArticleProperty) *types.CustomError
-	DeleteArticleProperty(data *ArticleProperty) *types.CustomError
+	DeleteArticleProperty(id uint) *types.CustomError
+	CheckPropertyExists(id uint) (bool, *types.CustomError)
 }
 
 type ArticleServiceInterface interface {
@@ -42,5 +43,5 @@ type ArticleServiceInterface interface {
 	DeleteArticleComment(userId, commentId uint) *types.CustomError
 	AddArticleProperty(data *ArticleProperty) *types.CustomError
 	EditArticleProperty(data *ArticleProperty) *types.CustomError
-	DeleteArticleProperty(data *ArticleProperty) *types.CustomError
+	DeleteArticleProperty(id uint) *types.CustomError
 }
