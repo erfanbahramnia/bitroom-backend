@@ -23,34 +23,13 @@ func NewArticleService(store ArticleStoreInterface) *ArticleService {
 
 func (a *ArticleService) AddArticle(data *NewArticle) (*Article, *types.CustomError) {
 	var wg sync.WaitGroup
-	// check category exists
-	existsChan := make(chan bool, 1)
-	errChan := make(chan *types.CustomError, 1)
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		exists, err := a.store.CheckCategoryExist(data.Category)
-		if err != nil {
-			errChan <- err
-			return
-		}
-		existsChan <- exists
-	}()
-
-	go func() {
-		wg.Wait()
-		close(existsChan)
-		close(errChan)
-	}()
-
-	select {
-	case exists := <-existsChan:
-		if !exists {
-			return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
-		}
-	case err := <-errChan:
+	// check category exist
+	exists, err := utils.CheckExistence(data.Category, a.store.CheckCategoryExist, 1)
+	if err != nil {
 		return nil, err
+	}
+	if !exists {
+		return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
 	}
 
 	// add new article
@@ -108,32 +87,12 @@ func (a *ArticleService) GetArticles() ([]MinimumArticle, *types.CustomError) {
 func (a *ArticleService) GetArticleById(id uint) (*article_model.Article, *types.CustomError) {
 	var wg sync.WaitGroup
 	// check article exist
-	existsChan := make(chan bool, 20)
-	checkErrChan := make(chan *types.CustomError, 20)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		exists, checkingErr := a.store.CheckArticleExist(id)
-		if checkingErr != nil {
-			checkErrChan <- checkingErr
-			return
-		}
-		existsChan <- exists
-	}()
-
-	go func() {
-		wg.Wait()
-		close(existsChan)
-		close(checkErrChan)
-	}()
-
-	select {
-	case err := <-checkErrChan:
+	exists, err := utils.CheckExistence(id, a.store.CheckArticleExist, 20)
+	if err != nil {
 		return nil, err
-	case exists := <-existsChan:
-		if !exists {
-			return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
-		}
+	}
+	if !exists {
+		return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
 	}
 
 	// get article
@@ -169,34 +128,12 @@ func (a *ArticleService) GetArticleById(id uint) (*article_model.Article, *types
 func (a *ArticleService) GetArticlesByCategory(categoryId uint) ([]MinimumArticle, *types.CustomError) {
 	var wg sync.WaitGroup
 	// check category exist
-	existsChan := make(chan bool, 10)
-	existsErrChan := make(chan *types.CustomError, 10)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		exist, existsErr := a.store.CheckCategoryExist(categoryId)
-		if existsErr != nil {
-			existsErrChan <- existsErr
-			return
-		}
-		existsChan <- exist
-	}()
-
-	go func() {
-		wg.Wait()
-		close(existsChan)
-		close(existsErrChan)
-	}()
-
-	select {
-	case err := <-existsErrChan:
-		if err != nil {
-			return nil, err
-		}
-	case exist := <-existsChan:
-		if !exist {
-			return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
-		}
+	exists, err := utils.CheckExistence(categoryId, a.store.CheckCategoryExist, 20)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
 	}
 
 	// get articles
@@ -232,74 +169,23 @@ func (a *ArticleService) GetArticlesByCategory(categoryId uint) ([]MinimumArticl
 func (a *ArticleService) EditArticle(article *EditArticle) *types.CustomError {
 	var wg sync.WaitGroup
 
-	// Helper function to check existence
-	// checkExistence := func(checkFunc func() (bool, *types.CustomError)) (bool, *types.CustomError) {
-	// 	wg.Add(1)
-	// 	defer wg.Done()
-
-	// 	exists, err := checkFunc()
-	// 	return exists, err
-	// }
-
 	// check article exists
-	existsChan := make(chan bool, 1)
-	checkErrChan := make(chan *types.CustomError, 1)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		exists, err := a.store.CheckArticleExist(*article.Id)
-		if err != nil {
-			checkErrChan <- err
-			return
-		}
-		existsChan <- exists
-	}()
-
-	go func() {
-		wg.Wait()
-		close(existsChan)
-		close(checkErrChan)
-	}()
-
-	select {
-	case err := <-checkErrChan:
+	exists, err := utils.CheckExistence(*article.Id, a.store.CheckArticleExist, 1)
+	if err != nil {
 		return err
-	case exists := <-existsChan:
-		if !exists {
-			return utils.NewError(constants.NotFound, http.StatusNotFound)
-		}
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
 	}
 
 	// check category exists
 	if article.Category != nil {
-		existsChan := make(chan bool, 1)
-		existsErrChan := make(chan *types.CustomError, 1)
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			exist, existsErr := a.store.CheckCategoryExist(*article.Category)
-			if existsErr != nil {
-				existsErrChan <- existsErr
-				return
-			}
-			existsChan <- exist
-		}()
-
-		go func() {
-			wg.Wait()
-			close(existsChan)
-			close(existsErrChan)
-		}()
-
-		select {
-		case err := <-existsErrChan:
-			if err != nil {
-				return err
-			}
-		case exist := <-existsChan:
-			if !exist {
-				return utils.NewError(constants.NotFound, http.StatusNotFound)
-			}
+		exists, err := utils.CheckExistence(*article.Category, a.store.CheckCategoryExist, 1)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			return utils.NewError(constants.NotFound, http.StatusNotFound)
 		}
 	}
 
@@ -331,32 +217,12 @@ func (a *ArticleService) EditArticle(article *EditArticle) *types.CustomError {
 func (a *ArticleService) DeleteArticle(id uint) *types.CustomError {
 	var wg sync.WaitGroup
 	// check article exists
-	existsChan := make(chan bool, 1)
-	checkErrChan := make(chan *types.CustomError, 1)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		exists, err := a.store.CheckArticleExist(id)
-		if err != nil {
-			checkErrChan <- err
-			return
-		}
-		existsChan <- exists
-	}()
-
-	go func() {
-		wg.Wait()
-		close(existsChan)
-		close(checkErrChan)
-	}()
-
-	select {
-	case err := <-checkErrChan:
+	exists, err := utils.CheckExistence(id, a.store.CheckArticleExist, 1)
+	if err != nil {
 		return err
-	case exists := <-existsChan:
-		if !exists {
-			return utils.NewError(constants.NotFound, http.StatusNotFound)
-		}
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
 	}
 	// delete images of article
 
@@ -387,32 +253,12 @@ func (a *ArticleService) DeleteArticle(id uint) *types.CustomError {
 func (a *ArticleService) AddArticleProperty(data *ArticleProperty) *types.CustomError {
 	var wg sync.WaitGroup
 	// check article exists
-	existsChan := make(chan bool, 1)
-	checkErrChan := make(chan *types.CustomError, 1)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		exists, err := a.store.CheckArticleExist(data.ArticleID)
-		if err != nil {
-			checkErrChan <- err
-			return
-		}
-		existsChan <- exists
-	}()
-
-	go func() {
-		wg.Wait()
-		close(existsChan)
-		close(checkErrChan)
-	}()
-
-	select {
-	case err := <-checkErrChan:
+	exists, err := utils.CheckExistence(data.ArticleID, a.store.CheckArticleExist, 1)
+	if err != nil {
 		return err
-	case exists := <-existsChan:
-		if !exists {
-			return utils.NewError(constants.NotFound, http.StatusNotFound)
-		}
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
 	}
 
 	// add property
@@ -442,32 +288,12 @@ func (a *ArticleService) AddArticleProperty(data *ArticleProperty) *types.Custom
 func (a *ArticleService) EditArticleProperty(data *EditArticleProperty) *types.CustomError {
 	var wg sync.WaitGroup
 	// check property exists
-	existsChan := make(chan bool, 1)
-	checkErrChan := make(chan *types.CustomError, 1)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		exists, err := a.store.CheckPropertyExists(data.PropertyID)
-		if err != nil {
-			checkErrChan <- err
-			return
-		}
-		existsChan <- exists
-	}()
-
-	go func() {
-		wg.Wait()
-		close(existsChan)
-		close(checkErrChan)
-	}()
-
-	select {
-	case err := <-checkErrChan:
+	exists, err := utils.CheckExistence(data.PropertyID, a.store.CheckPropertyExists, 1)
+	if err != nil {
 		return err
-	case exists := <-existsChan:
-		if !exists {
-			return utils.NewError(constants.NotFound, http.StatusNotFound)
-		}
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
 	}
 
 	// edit
@@ -497,32 +323,12 @@ func (a *ArticleService) EditArticleProperty(data *EditArticleProperty) *types.C
 func (a *ArticleService) DeleteArticleProperty(id uint) *types.CustomError {
 	var wg sync.WaitGroup
 	// check property exists
-	existsChan := make(chan bool, 1)
-	checkErrChan := make(chan *types.CustomError, 1)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		exists, err := a.store.CheckPropertyExists(id)
-		if err != nil {
-			checkErrChan <- err
-			return
-		}
-		existsChan <- exists
-	}()
-
-	go func() {
-		wg.Wait()
-		close(existsChan)
-		close(checkErrChan)
-	}()
-
-	select {
-	case err := <-checkErrChan:
+	exists, err := utils.CheckExistence(id, a.store.CheckPropertyExists, 1)
+	if err != nil {
 		return err
-	case exists := <-existsChan:
-		if !exists {
-			return utils.NewError(constants.NotFound, http.StatusNotFound)
-		}
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
 	}
 
 	// delete

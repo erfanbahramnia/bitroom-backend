@@ -296,5 +296,5 @@ func (a *ArticleStore) CheckPropertyExists(id uint) (bool, *types.CustomError) {
 	if err != nil {
 		return false, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
 	}
-	return true, nil
+	return exists, nil
 }

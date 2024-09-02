@@ -27,3 +27,5 @@ type CustomError struct {
 	Message string
 	Code    int
 }
+
+type ExsitenceChecker func(uint) (bool, *CustomError)
