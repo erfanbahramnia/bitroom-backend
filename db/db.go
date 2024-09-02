@@ -2,11 +2,6 @@ package db
 
 import (
 	"bitroom/config"
-	article_model "bitroom/models/article"
-	category_model "bitroom/models/category"
-	course_model "bitroom/models/course"
-	news_model "bitroom/models/news"
-	user_model "bitroom/models/user"
 	"fmt"
 	"log"
 
@@ -24,17 +19,6 @@ func InitDb() *gorm.DB {
 		log.Fatal("could not connect db...")
 	}
 
-	if err := db.AutoMigrate(
-		&user_model.User{},
-		&article_model.Article{},
-		&article_model.ArticleProperty{},
-		&article_model.ArticleComment{},
-		&news_model.News{},
-		&course_model.Course{},
-		&category_model.Category{},
-	); err != nil {
-		log.Fatal(err)
-	}
 	// success
 	return db
 }

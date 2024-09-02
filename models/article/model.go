@@ -2,12 +2,10 @@ package article_model
 
 import (
 	category_model "bitroom/models/category"
-
-	"gorm.io/gorm"
 )
 
 type Article struct {
-	gorm.Model
+	ID          uint                    `gorm:"primaryKey"`
 	Title       string                  `gorm:"not null"`
 	Description string                  `gorm:"not null"`
 	Summary     string                  `gorm:"not null"`
@@ -20,14 +18,14 @@ type Article struct {
 }
 
 type ArticleComment struct {
-	gorm.Model
+	ID        uint   `gorm:"primaryKey"`
 	Comment   string `gorm:"type:text;not null"`
 	ArticleID uint   `gorm:"not null"`
 	UserID    uint   `gorm:"not null"`
 }
 
 type ArticleProperty struct {
-	gorm.Model
+	ID          uint   `gorm:"primaryKey"`
 	Description string `gorm:"type:text;not null;column:description"`
 	Image       string `gorm:"type:varchar(255);default:''"`
 	ArticleID   uint   `gorm:"not null"`
