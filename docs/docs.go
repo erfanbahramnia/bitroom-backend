@@ -166,6 +166,18 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/article/popular": {
+            "get": {
+                "description": "get all popular articles",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "responses": {}
+            }
+        },
         "/article/property/add": {
             "post": {
                 "tags": [

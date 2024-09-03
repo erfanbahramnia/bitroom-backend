@@ -23,6 +23,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 
 	group.POST("/add", a.AddArticle)
 	group.GET("/all", a.GetArticles)
+	group.GET("/popular", a.GetPopularArticles)
 	group.GET("/:id", a.GetArticleById)
 	group.PUT("/edit", a.EditArticle)
 	group.DELETE("/:id", a.DeleteArticleById)
@@ -363,5 +364,24 @@ func (a *ArticleHandler) DeleteArticleProperty(ctx echo.Context) error {
 	// success
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"message": "ok",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Description get all popular articles
+// @Tags articles
+// @Produce json
+// @Router /article/popular [get]
+func (a *ArticleHandler) GetPopularArticles(ctx echo.Context) error {
+
+	// get articles
+	articles, err := a.service.GetPopularArticles()
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"articles": articles,
 	})
 }

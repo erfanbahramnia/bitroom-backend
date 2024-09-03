@@ -1,5 +1,7 @@
 package article
 
+import "github.com/lib/pq"
+
 type NewArticle struct {
 	Title       string `json:"title" validate:"required,max=100"`
 	Description string `json:"description" validate:"required"`
@@ -29,7 +31,10 @@ type Article struct {
 	Summary     string `json:"summary"`
 	Status      string `json:"status"`
 	Image       string `json:"image"`
-	ID          uint   `json:"id"`
+	Likes       pq.Int64Array
+	Dislikes    pq.Int64Array
+	Views       int
+	ID          uint `json:"id"`
 }
 
 type EditArticle struct {

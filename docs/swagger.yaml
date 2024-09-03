@@ -227,6 +227,14 @@ paths:
       responses: {}
       tags:
       - articles
+  /article/popular:
+    get:
+      description: get all popular articles
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - articles
   /article/property/{propertyId}:
     delete:
       parameters:

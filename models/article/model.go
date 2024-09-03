@@ -2,6 +2,8 @@ package article_model
 
 import (
 	category_model "bitroom/models/category"
+
+	"github.com/lib/pq"
 )
 
 type Article struct {
@@ -10,6 +12,9 @@ type Article struct {
 	Description string                  `gorm:"not null"`
 	Summary     string                  `gorm:"not null"`
 	Image       string                  `gorm:"not null"`
+	Likes       pq.Int64Array           `gorm:"type:BIGINT[];default:'{}'"`
+	Dislikes    pq.Int64Array           `gorm:"type:BIGINT[];default:'{}'"`
+	Views       int                     `gorm:"default:0"`
 	Status      string                  `gorm:"default:'InProgress'"`
 	Properties  []ArticleProperty       `gorm:"foreignKey:ArticleID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Comments    []ArticleComment        `gorm:"foreignKey:ArticleID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

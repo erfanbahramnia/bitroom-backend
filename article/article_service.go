@@ -356,8 +356,11 @@ func (a *ArticleService) DeleteArticleProperty(id uint) *types.CustomError {
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleService) GetPopularArticles() ([]MinimumArticle, *types.CustomError) {
-
-	return nil, nil
+	articles, err := a.store.GetPopularArticles()
+	if err != nil {
+		return nil, err
+	}
+	return articles, nil
 }
 
 // --------------------------------------------------------------------------------------------------------------------

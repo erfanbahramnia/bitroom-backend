@@ -74,12 +74,18 @@ func (a *ArticleStore) GetArticles() ([]MinimumArticle, *types.CustomError) {
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleStore) GetArticleById(id uint) (*article_model.Article, *types.CustomError) {
+
 	// get article
 	var article article_model.Article
 	err := a.db.Preload("Properties").Preload("Comments").Preload("Category").First(&article, id).Error
 	if err != nil {
 		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
 	}
+
+	// update views counter
+	article.Views++
+	a.db.Save(&article)
+
 	// success
 	return &article, nil
 }
@@ -219,8 +225,11 @@ func (a *ArticleStore) DeleteArticleProperty(id uint) *types.CustomError {
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleStore) GetPopularArticles() ([]MinimumArticle, *types.CustomError) {
-
-	return nil, nil
+	var articles []MinimumArticle
+	if err := a.db.Model(&article_model.Article{}).Order("views desc").Limit(10).Find(&articles).Error; err != nil {
+		return nil, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	return articles, nil
 }
 
 // --------------------------------------------------------------------------------------------------------------------
