@@ -21,11 +21,14 @@ type ArticleStoreInterface interface {
 	DeleteArticle(id uint) *types.CustomError
 	DeleteArticleProperty(id uint) *types.CustomError
 	DeleteArticleComment(userId, commentId uint) *types.CustomError
-	LikeArticle(userId, articleId uint) *types.CustomError
-	DislikeArticle(userId, articleId uint) *types.CustomError
 	CheckArticleExist(id uint) (bool, *types.CustomError)
 	CheckCategoryExist(id uint) (bool, *types.CustomError)
 	CheckPropertyExists(id uint) (bool, *types.CustomError)
+	LikeArticle(data *LikeOrDislikeArticle) *types.CustomError
+	CheckUserDisliked(data *LikeOrDislikeArticle) (bool, *types.CustomError)
+	RemoveFromDislike(data *LikeOrDislikeArticle) *types.CustomError
+	CheckUserLiked(data *LikeOrDislikeArticle) (bool, *types.CustomError)
+	RemoveFromLike(data *LikeOrDislikeArticle) *types.CustomError
 }
 
 type ArticleServiceInterface interface {
@@ -36,12 +39,11 @@ type ArticleServiceInterface interface {
 	EditArticle(*EditArticle) *types.CustomError
 	DeleteArticle(id uint) *types.CustomError
 	GetPopularArticles() ([]MinimumArticle, *types.CustomError)
-	LikeArticle(userId, articleId uint) *types.CustomError
-	DislikeArticle(userId, articleId uint) *types.CustomError
 	AddCommentToArticle(data *UserComment) *types.CustomError
 	EditArticleComment(data *UserComment, commentId uint) (*ArticleComment, *types.CustomError)
 	DeleteArticleComment(userId, commentId uint) *types.CustomError
 	AddArticleProperty(data *ArticleProperty) *types.CustomError
 	EditArticleProperty(data *EditArticleProperty) *types.CustomError
 	DeleteArticleProperty(id uint) *types.CustomError
+	LikeArticle(data *LikeOrDislikeArticle) *types.CustomError
 }

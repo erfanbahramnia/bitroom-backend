@@ -234,15 +234,25 @@ func (a *ArticleStore) GetPopularArticles() ([]MinimumArticle, *types.CustomErro
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) LikeArticle(userId, articleId uint) *types.CustomError {
-
+func (a *ArticleStore) LikeArticle(data *LikeOrDislikeArticle) *types.CustomError {
+	if err := a.db.Model(&article_model.Article{}).
+		Where("id = ?", data.ArticleId).
+		Update("likes", gorm.Expr("array_append(likes, ?)", data.UserId)).Error; err != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// success
 	return nil
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) DislikeArticle(userId, articleId uint) *types.CustomError {
-
+func (a *ArticleStore) DislikeArticle(data *LikeOrDislikeArticle) *types.CustomError {
+	if err := a.db.Model(&article_model.Article{}).
+		Where("id = ?", data.ArticleId).
+		Update("dislikes", gorm.Expr("array_append(dislikes, ?)", data.UserId)).Error; err != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// success
 	return nil
 }
 
@@ -306,4 +316,54 @@ func (a *ArticleStore) CheckPropertyExists(id uint) (bool, *types.CustomError) {
 		return false, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
 	}
 	return exists, nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) CheckUserDisliked(data *LikeOrDislikeArticle) (bool, *types.CustomError) {
+	var count int64
+
+	if err := a.db.Model(&article_model.Article{}).Where("id = ?", data.ArticleId).Where("? = ANY(dislikes)", data.UserId).Count(&count).Error; err != nil {
+		return false, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+
+	exists := count > 0
+	return exists, nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) RemoveFromDislike(data *LikeOrDislikeArticle) *types.CustomError {
+	if err := a.db.Model(&article_model.Article{}).
+		Where("id = ?", data.ArticleId).
+		Update("dislikes", gorm.Expr("array_remove(dislikes, ?)", data.UserId)).Error; err != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// success
+	return nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) CheckUserLiked(data *LikeOrDislikeArticle) (bool, *types.CustomError) {
+	var count int64
+
+	if err := a.db.Model(&article_model.Article{}).Where("id = ?", data.ArticleId).Where("? = ANY(likes)", data.UserId).Count(&count).Error; err != nil {
+		return false, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+
+	exists := count > 0
+	return exists, nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) RemoveFromLike(data *LikeOrDislikeArticle) *types.CustomError {
+	if err := a.db.Model(&article_model.Article{}).
+		Where("id = ?", data.ArticleId).
+		Update("likes", gorm.Expr("array_remove(likes, ?)", data.UserId)).Error; err != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// success
+	return nil
 }

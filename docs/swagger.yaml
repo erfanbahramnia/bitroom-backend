@@ -1,5 +1,15 @@
 basePath: /
 definitions:
+  article.LikeOrDislikeArticle:
+    properties:
+      article_id:
+        type: integer
+      user_id:
+        type: integer
+    required:
+    - article_id
+    - user_id
+    type: object
   auth.LoginCredential:
     properties:
       password:
@@ -212,6 +222,24 @@ paths:
       produces:
       - application/json
       responses: {}
+      tags:
+      - articles
+  /article/like:
+    put:
+      consumes:
+      - application/json
+      description: like article
+      parameters:
+      - description: like article
+        in: body
+        name: register
+        schema:
+          $ref: '#/definitions/article.LikeOrDislikeArticle'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
       tags:
       - articles
   /article/popular:

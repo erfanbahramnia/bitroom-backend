@@ -158,6 +158,36 @@
                 "responses": {}
             }
         },
+        "/article/like": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "like article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "description": "like article",
+                        "name": "register",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/article.LikeOrDislikeArticle"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/article/popular": {
             "get": {
                 "description": "get all popular articles",
@@ -664,6 +694,21 @@
         }
     },
     "definitions": {
+        "article.LikeOrDislikeArticle": {
+            "type": "object",
+            "required": [
+                "article_id",
+                "user_id"
+            ],
+            "properties": {
+                "article_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "auth.LoginCredential": {
             "type": "object",
             "required": [

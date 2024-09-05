@@ -56,3 +56,8 @@ type MinimumArticle struct {
 
 type ArticleComment struct {
 }
+
+type LikeOrDislikeArticle struct {
+	UserId    uint `json:"user_id" validate:"required"`
+	ArticleId uint `json:"article_id" validate:"required"`
+}

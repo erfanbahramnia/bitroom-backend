@@ -1,7 +1,10 @@
 package article
 
 import (
+	"bitroom/constants"
+	"bitroom/middleware"
 	"bitroom/utils"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -33,6 +36,8 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group.POST("/property/add", a.AddArticleProperty)
 	group.PUT("/property/edit", a.EditArticleProperty)
 	group.DELETE("/property/:propertyId", a.DeleteArticleProperty)
+
+	group.PUT("/like", a.LikeArticle, middleware.JwtMiddleware)
 }
 
 // AddArticle godoc
@@ -383,5 +388,44 @@ func (a *ArticleHandler) GetPopularArticles(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"articles": articles,
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Description like article
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param register body LikeOrDislikeArticle ture "like article"
+// @Router /article/like [put]
+// @Security BearerAuth
+func (a *ArticleHandler) LikeArticle(ctx echo.Context) error {
+	// get data
+	var data LikeOrDislikeArticle
+
+	// bind json to struct
+	if err := ctx.Bind(&data); err != nil {
+		fmt.Println(err)
+		return echo.NewHTTPError(http.StatusBadRequest, constants.InvalidInputFormat)
+	}
+
+	// validate
+	vs := utils.GetValidator()
+	vsErrs := vs.Validate(data)
+	if len(vsErrs) > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"errors": vsErrs,
+		})
+	}
+
+	// update article
+	if err := a.service.LikeArticle(&data); err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "ok",
 	})
 }
