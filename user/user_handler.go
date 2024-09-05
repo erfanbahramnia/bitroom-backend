@@ -26,6 +26,7 @@ func (u *UserHandler) InitHandler(ech *echo.Echo) {
 	group := ech.Group("user", middleware.JwtMiddleware)
 
 	group.PUT("/edit", u.EditUser)
+	group.PUT("/password/change", u.ChangePaasword)
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -65,4 +66,44 @@ func (u *UserHandler) EditUser(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, utils.MapStringInterface("msg", "ok"))
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Description change password
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param register body ChangePaasword true "Change password"
+// @Router /user/password/change [put]
+// @Security BearerAuth
+func (u *UserHandler) ChangePaasword(ctx echo.Context) error {
+	var data ChangePaasword
+
+	// bind json to struct
+	if err := ctx.Bind(&data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, constants.InvalidInputFormat)
+	}
+
+	// validate
+	vs := utils.GetValidator()
+	vsErrs := vs.Validate(data)
+	if len(vsErrs) > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"errors": vsErrs,
+		})
+	}
+
+	// get user data
+	claim := ctx.Get("user").(*types.JwtCustomClaims)
+
+	// update
+	if err := u.service.ChangePaasword(claim.Phone, data.Password); err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "password updated successfully",
+	})
 }

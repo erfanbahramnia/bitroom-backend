@@ -217,8 +217,7 @@ func (a *AuthHandler) SendOtpForLoging(ctx echo.Context) error {
 
 	// success
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
-		"msg":     constants.OtpSended,
-		"expires": constants.CacheItemTimeExpiration,
+		"msg": constants.OtpSended,
 	})
 }
 

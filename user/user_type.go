@@ -13,3 +13,7 @@ type User struct {
 	Phone     string `gorm:"not null;unique"`
 	Password  string `gorm:"default:''"`
 }
+
+type ChangePaasword struct {
+	Password string `json:"password" validate:"required,min=5,max=40"`
+}

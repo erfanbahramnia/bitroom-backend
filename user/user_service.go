@@ -15,6 +15,8 @@ func NewUserSerivce(store UserStoreInterface) *UserService {
 	}
 }
 
+// -----------------------------------------------------------------------------------------------------------
+
 func (u *UserService) EditUserData(data *EditUser, userId uint) *types.CustomError {
 	var wg sync.WaitGroup
 	// update
@@ -36,4 +38,12 @@ func (u *UserService) EditUserData(data *EditUser, userId uint) *types.CustomErr
 	}
 
 	return nil
+}
+
+// -----------------------------------------------------------------------------------------------------------
+
+func (u *UserService) ChangePaasword(phone, password string) *types.CustomError {
+	// update pass
+	err := u.store.ChangePaasword(phone, password)
+	return err
 }

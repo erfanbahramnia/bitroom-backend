@@ -89,6 +89,15 @@ definitions:
       token:
         type: string
     type: object
+  user.ChangePaasword:
+    properties:
+      password:
+        maxLength: 40
+        minLength: 5
+        type: string
+    required:
+    - password
+    type: object
   user.EditUser:
     properties:
       first_name:
@@ -506,6 +515,25 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/user.EditUser'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - users
+  /user/password/change:
+    put:
+      consumes:
+      - application/json
+      description: change password
+      parameters:
+      - description: Change password
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/user.ChangePaasword'
       produces:
       - application/json
       responses: {}

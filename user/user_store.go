@@ -61,3 +61,26 @@ func (u *UserStore) CheckUserCompletedData(id uint) *types.CustomError {
 	}
 	return nil
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (u *UserStore) ChangePaasword(phone, password string) *types.CustomError {
+	// hash the password
+	hash, err := utils.HashPassword(password)
+	if err != nil {
+		return utils.NewError("could not hash the password", http.StatusInternalServerError)
+	}
+	// get user
+	var user User
+	if err := u.db.Model(&user_model.User{}).Where("phone = ?", phone).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return utils.NewError(constants.NotFound, http.StatusNotFound)
+		}
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// update
+	user.Password = hash
+	u.db.Save(user)
+	// success
+	return nil
+}

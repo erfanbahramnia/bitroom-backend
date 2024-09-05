@@ -646,6 +646,37 @@ const docTemplate = `{
                 ],
                 "responses": {}
             }
+        },
+        "/user/password/change": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "change password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "description": "Change password",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.ChangePaasword"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
         }
     },
     "definitions": {
@@ -772,6 +803,19 @@ const docTemplate = `{
                 },
                 "token": {
                     "type": "string"
+                }
+            }
+        },
+        "user.ChangePaasword": {
+            "type": "object",
+            "required": [
+                "password"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "maxLength": 40,
+                    "minLength": 5
                 }
             }
         },
