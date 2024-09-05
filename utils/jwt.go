@@ -10,7 +10,9 @@ import (
 
 func GenerateJwtToken(claim types.UserDataJwtClaims) (string, error) {
 	tokenClaims := types.JwtCustomClaims{
+		Id:    claim.Id,
 		Phone: claim.Phone,
+		Role:  claim.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(2 * time.Hour).Unix(),
 		},
@@ -25,7 +27,9 @@ func GenerateJwtToken(claim types.UserDataJwtClaims) (string, error) {
 
 func GenerateJwtRefreshToken(claim types.UserDataJwtClaims) (string, error) {
 	refreshClaims := types.JwtCustomClaims{
+		Id:    claim.Id,
 		Phone: claim.Phone,
+		Role:  claim.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
 		},

@@ -74,3 +74,9 @@ func CheckExistence(id uint, checker types.ExsitenceChecker, bufferSize int) (bo
 		return exists, nil
 	}
 }
+
+func MapStringInterface(field string, input any) map[string]interface{} {
+	return map[string]interface{}{
+		field: input,
+	}
+}

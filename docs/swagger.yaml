@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   auth.AuthResponse:
     properties:
@@ -88,8 +89,17 @@ definitions:
       token:
         type: string
     type: object
+  user.EditUser:
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+    type: object
 info:
   contact: {}
+  title: Swagger Example API
+  version: "1.0"
 paths:
   /article/{id}:
     delete:
@@ -450,4 +460,28 @@ paths:
       summary: Get Categorys with tree format
       tags:
       - category
+  /user/edit:
+    put:
+      consumes:
+      - application/json
+      description: edit user data
+      parameters:
+      - description: Edit data
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/user.EditUser'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

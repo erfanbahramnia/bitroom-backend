@@ -4,14 +4,11 @@ import (
 	"bitroom/article"
 	"bitroom/auth"
 	"bitroom/category"
+	"bitroom/user"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
-
-// @title Swagger Example API
-// @version 1.0
-// @BasePath /
 
 func InitApi(db *gorm.DB, ech *echo.Echo, port string) {
 	// auth apis
@@ -19,6 +16,12 @@ func InitApi(db *gorm.DB, ech *echo.Echo, port string) {
 	authService := auth.NewAuthService(authStore)
 	authHandler := auth.NewAuthHandler(authService)
 	authHandler.InitHandler(ech)
+
+	// user apis
+	userStore := user.NewUserStore(db)
+	userService := user.NewUserSerivce(userStore)
+	userHandler := user.NewUserHandler(userService)
+	userHandler.InitHandler(ech)
 
 	// category apis
 	categoryStore := category.NewCategoryStore(db)

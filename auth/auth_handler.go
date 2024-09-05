@@ -98,6 +98,7 @@ func (a *AuthHandler) OtpRegisterValidation(ctx echo.Context) error {
 	}
 	// generate new jwt tokens
 	claims := types.UserDataJwtClaims{
+		Id:    user.ID,
 		Role:  user.Role,
 		Phone: data.Phone,
 	}
@@ -155,6 +156,8 @@ func (a *AuthHandler) HandleLogin(ctx echo.Context) error {
 	// generate new jwt tokens
 	claims := types.UserDataJwtClaims{
 		Phone: userReq.Phone,
+		Id:    userData.ID,
+		Role:  userData.Role,
 	}
 	jwt, jwtErr := utils.GenerateJwt(claims)
 	if jwtErr != nil {

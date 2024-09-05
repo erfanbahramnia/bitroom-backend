@@ -13,6 +13,14 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// @title Swagger Example API
+// @version 1.0
+// @BasePath /
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 func main() {
 	// connect db
 	db := db.InitDb()
