@@ -341,6 +341,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/login/send-otp": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "login with otp",
+                "parameters": [
+                    {
+                        "description": "Register request",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.RequiredDataForOtp"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/auth/login/validate-otp": {
+            "post": {
+                "description": "send otp for loging",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "parameters": [
+                    {
+                        "description": "Login request",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.ValidateOtp"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/auth/register/send-otp": {
             "post": {
                 "description": "User registration",
@@ -361,7 +413,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.RequiredOtpRegistering"
+                            "$ref": "#/definitions/auth.RequiredDataForOtp"
                         }
                     }
                 ],
@@ -392,7 +444,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.ValidateOtpRegistering"
+                            "$ref": "#/definitions/auth.ValidateOtp"
                         }
                     }
                 ],
@@ -664,7 +716,7 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.RequiredOtpRegistering": {
+        "auth.RequiredDataForOtp": {
             "type": "object",
             "required": [
                 "phone"
@@ -677,7 +729,7 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.ValidateOtpRegistering": {
+        "auth.ValidateOtp": {
             "type": "object",
             "required": [
                 "otp",

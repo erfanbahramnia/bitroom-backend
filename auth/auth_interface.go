@@ -14,5 +14,7 @@ type AuthStoreInterface interface {
 type AuthServiceInterface interface {
 	Login(user LoginCredential) (*user_model.User, *types.CustomError)
 	OtpGeneratingForRegister(phone string) (string, *types.CustomError)
-	ValidateOtpRegister(data ValidateOtpRegistering) (*user_model.User, *types.CustomError)
+	ValidateOtpRegister(data ValidateOtp) (*user_model.User, *types.CustomError)
+	OtpGeneratingForLogin(phone string) (string, *types.CustomError)
+	ValidateOtpLogin(data ValidateOtp) (*user_model.User, *types.CustomError)
 }

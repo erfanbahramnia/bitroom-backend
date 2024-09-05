@@ -4,11 +4,11 @@ import (
 	"bitroom/types"
 )
 
-type RequiredOtpRegistering struct {
+type RequiredDataForOtp struct {
 	Phone string `json:"phone" validate:"required,min=11,max=11"`
 }
 
-type ValidateOtpRegistering struct {
+type ValidateOtp struct {
 	Phone string `json:"phone" validate:"required,min=11,max=11"`
 	Otp   string `json:"otp" validate:"required,min=5,max=5"`
 }

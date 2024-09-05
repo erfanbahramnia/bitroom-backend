@@ -48,7 +48,7 @@ definitions:
       user_id:
         type: integer
     type: object
-  auth.RequiredOtpRegistering:
+  auth.RequiredDataForOtp:
     properties:
       phone:
         maxLength: 11
@@ -57,7 +57,7 @@ definitions:
     required:
     - phone
     type: object
-  auth.ValidateOtpRegistering:
+  auth.ValidateOtp:
     properties:
       otp:
         maxLength: 5
@@ -316,6 +316,40 @@ paths:
       summary: Login
       tags:
       - auth
+  /auth/login/send-otp:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Register request
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RequiredDataForOtp'
+      produces:
+      - application/json
+      responses: {}
+      summary: login with otp
+      tags:
+      - auth
+  /auth/login/validate-otp:
+    post:
+      consumes:
+      - application/json
+      description: send otp for loging
+      parameters:
+      - description: Login request
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/auth.ValidateOtp'
+      produces:
+      - application/json
+      responses: {}
+      tags:
+      - auth
   /auth/register/send-otp:
     post:
       consumes:
@@ -327,7 +361,7 @@ paths:
         name: register
         required: true
         schema:
-          $ref: '#/definitions/auth.RequiredOtpRegistering'
+          $ref: '#/definitions/auth.RequiredDataForOtp'
       produces:
       - application/json
       responses:
@@ -347,7 +381,7 @@ paths:
         name: register
         required: true
         schema:
-          $ref: '#/definitions/auth.ValidateOtpRegistering'
+          $ref: '#/definitions/auth.ValidateOtp'
       produces:
       - application/json
       responses:
