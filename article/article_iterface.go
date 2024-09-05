@@ -25,6 +25,7 @@ type ArticleStoreInterface interface {
 	CheckCategoryExist(id uint) (bool, *types.CustomError)
 	CheckPropertyExists(id uint) (bool, *types.CustomError)
 	LikeArticle(data *LikeOrDislikeArticle) *types.CustomError
+	DislikeArticle(data *LikeOrDislikeArticle) *types.CustomError
 	CheckUserDisliked(data *LikeOrDislikeArticle) (bool, *types.CustomError)
 	RemoveFromDislike(data *LikeOrDislikeArticle) *types.CustomError
 	CheckUserLiked(data *LikeOrDislikeArticle) (bool, *types.CustomError)
@@ -46,4 +47,5 @@ type ArticleServiceInterface interface {
 	EditArticleProperty(data *EditArticleProperty) *types.CustomError
 	DeleteArticleProperty(id uint) *types.CustomError
 	LikeArticle(data *LikeOrDislikeArticle) *types.CustomError
+	DislikeArticle(data *LikeOrDislikeArticle) *types.CustomError
 }

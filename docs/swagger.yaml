@@ -185,6 +185,24 @@ paths:
       summary: Get Articles By category
       tags:
       - articles
+  /article/dislike:
+    put:
+      consumes:
+      - application/json
+      description: dislike article
+      parameters:
+      - description: like article
+        in: body
+        name: register
+        schema:
+          $ref: '#/definitions/article.LikeOrDislikeArticle'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - articles
   /article/edit:
     put:
       consumes:

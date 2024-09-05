@@ -398,7 +398,32 @@ func (a *ArticleService) LikeArticle(data *LikeOrDislikeArticle) *types.CustomEr
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleService) DislikeArticle(data *LikeOrDislikeArticle) *types.CustomError {
-
+	// check user already disliked or not
+	disliked, err := a.store.CheckUserDisliked(data)
+	if err != nil {
+		return err
+	}
+	if disliked {
+		return utils.NewError("user already disliked", http.StatusBadRequest)
+	}
+	// check user already liked or not
+	liked, err := a.store.CheckUserLiked(data)
+	if err != nil {
+		return err
+	}
+	if liked {
+		// remove from like
+		err = a.store.RemoveFromLike(data)
+		if err != nil {
+			return err
+		}
+	}
+	// update
+	err = a.store.DislikeArticle(data)
+	if err != nil {
+		return err
+	}
+	// success
 	return nil
 }
 

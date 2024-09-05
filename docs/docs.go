@@ -107,6 +107,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/article/dislike": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "dislike article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "description": "like article",
+                        "name": "register",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/article.LikeOrDislikeArticle"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/article/edit": {
             "put": {
                 "description": "Edit an article",
