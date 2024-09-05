@@ -22,7 +22,7 @@ func NewAuthService(store AuthStoreInterface) *AuthService {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *AuthService) Login(user LoginCredential) (*user_model.User, *types.CustomError) {
+func (a *AuthService) LoginWithPassword(user *LoginCredential) (*user_model.User, *types.CustomError) {
 	errorChan := make(chan *types.CustomError, 1)
 	userChan := make(chan *user_model.User, 1)
 	go func() {

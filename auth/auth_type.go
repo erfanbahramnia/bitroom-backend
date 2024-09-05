@@ -20,7 +20,7 @@ type RegisterResponse struct {
 
 type LoginCredential struct {
 	Phone    string `json:"phone" validate:"required,min=11,max=11"`
-	Password string `json:"password" validate:"required,min=3,max=20"`
+	Password string `json:"password" validate:"required,min=5,max=40"`
 }
 
 type AuthResponse struct {

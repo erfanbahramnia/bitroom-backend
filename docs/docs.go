@@ -307,9 +307,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/login": {
+        "/auth/login/password": {
             "post": {
-                "description": "User registration",
+                "description": "login with password",
                 "consumes": [
                     "application/json"
                 ],
@@ -319,10 +319,9 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "Login",
                 "parameters": [
                     {
-                        "description": "Register request",
+                        "description": "login with password",
                         "name": "register",
                         "in": "body",
                         "required": true,
@@ -331,14 +330,7 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/auth.AuthResponse"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/auth/login/send-otp": {
@@ -680,40 +672,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "auth.AuthResponse": {
-            "type": "object",
-            "required": [
-                "first_name",
-                "last_name",
-                "phone"
-            ],
-            "properties": {
-                "first_name": {
-                    "type": "string",
-                    "maxLength": 30,
-                    "minLength": 3
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "jwt": {
-                    "$ref": "#/definitions/types.JwtTokens"
-                },
-                "last_name": {
-                    "type": "string",
-                    "maxLength": 40,
-                    "minLength": 3
-                },
-                "phone": {
-                    "type": "string",
-                    "maxLength": 11,
-                    "minLength": 11
-                },
-                "role": {
-                    "type": "string"
-                }
-            }
-        },
         "auth.LoginCredential": {
             "type": "object",
             "required": [
@@ -723,8 +681,8 @@ const docTemplate = `{
             "properties": {
                 "password": {
                     "type": "string",
-                    "maxLength": 20,
-                    "minLength": 3
+                    "maxLength": 40,
+                    "minLength": 5
                 },
                 "phone": {
                     "type": "string",
@@ -792,17 +750,6 @@ const docTemplate = `{
                 "parent_id": {
                     "type": "integer",
                     "minimum": 0
-                }
-            }
-        },
-        "types.JwtTokens": {
-            "type": "object",
-            "properties": {
-                "refreshToken": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
                 }
             }
         },
