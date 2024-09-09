@@ -138,6 +138,37 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/article/comment/edit": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "edit comment by user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "description": "Edit comment",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/article.EditComment"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/article/dislike": {
             "put": {
                 "security": [
@@ -763,6 +794,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "article.EditComment": {
+            "type": "object",
+            "required": [
+                "article_id",
+                "comment",
+                "comment_id"
+            ],
+            "properties": {
+                "article_id": {
+                    "type": "integer"
+                },
+                "comment": {
+                    "type": "string",
+                    "minLength": 3
+                },
+                "comment_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "article.NewComment": {
             "type": "object",
             "required": [

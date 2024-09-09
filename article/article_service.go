@@ -478,9 +478,19 @@ func (a *ArticleService) AddCommentToArticle(data *NewComment) *types.CustomErro
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleService) EditArticleComment(data string, commentId uint) *types.CustomError {
+func (a *ArticleService) EditArticleComment(data *EditComment) *types.CustomError {
+	var wg sync.WaitGroup
 
-	return nil
+	errChan := make(chan *types.CustomError, 1)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err := a.store.EditArticleComment(data)
+		errChan <- err
+	}()
+
+	err := <-errChan
+	return err
 }
 
 // --------------------------------------------------------------------------------------------------------------------

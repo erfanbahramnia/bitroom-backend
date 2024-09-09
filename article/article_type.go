@@ -56,3 +56,10 @@ type NewComment struct {
 	UserID    uint   `json:"-"`
 	ArticleID uint   `json:"article_id" validate:"required"`
 }
+
+type EditComment struct {
+	ArticleId uint   `json:"article_id" validate:"required"`
+	CommentId uint   `json:"comment_id" validate:"required"`
+	UserID    uint   `json:"-"`
+	Comment   string `json:"comment" validate:"required,min=3"`
+}

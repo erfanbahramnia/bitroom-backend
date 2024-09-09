@@ -42,6 +42,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group.PUT("/dislike", a.DislikeArticle, middleware.JwtMiddleware)
 
 	group.POST("/comment/add", a.AddComment, middleware.JwtMiddleware)
+	group.PUT("/comment/edit", a.EditComment, middleware.JwtMiddleware)
 }
 
 // AddArticle godoc
@@ -507,14 +508,53 @@ func (a *ArticleHandler) AddComment(ctx echo.Context) error {
 		})
 	}
 
-	fmt.Println("2222")
 	// get user id
 	claim := ctx.Get("user").(*types.JwtCustomClaims)
-	fmt.Println("3333")
 	data.UserID = claim.Id
 
 	// add comment
 	err := a.service.AddCommentToArticle(&data)
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "ok",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Description edit comment by user
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param register body EditComment true "Edit comment"
+// @Router /article/comment/edit [put]
+// @Security BearerAuth
+func (a *ArticleHandler) EditComment(ctx echo.Context) error {
+	var data EditComment
+
+	// bind json to struct
+	if err := ctx.Bind(&data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, constants.InvalidInputFormat)
+	}
+
+	// validate
+	vs := utils.GetValidator()
+	vsErrs := vs.Validate(data)
+	if len(vsErrs) > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"errors": vsErrs,
+		})
+	}
+
+	// get user id
+	data.UserID = ctx.Get("user").(*types.JwtCustomClaims).Id
+
+	// edit comment
+	err := a.service.EditArticleComment(&data)
 	if err != nil {
 		return echo.NewHTTPError(err.Code, err.Message)
 	}

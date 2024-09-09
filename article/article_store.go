@@ -276,8 +276,21 @@ func (a *ArticleStore) AddCommentToArticle(data *NewComment) *types.CustomError 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) EditArticleComment(comment string, commentId uint) *types.CustomError {
+func (a *ArticleStore) EditArticleComment(data *EditComment) *types.CustomError {
+	// update comment
+	result := a.db.Model(&article_model.ArticleComment{}).
+		Where("article_id = ? AND user_id = ? AND id = ?", data.ArticleId, data.UserID, data.CommentId).
+		Updates(&article_model.ArticleComment{Comment: data.Comment})
 
+	if result.Error != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+
+	if result.RowsAffected == 0 {
+		return utils.NewError("comment not found or no changes made", http.StatusNotFound)
+	}
+
+	// success
 	return nil
 }
 

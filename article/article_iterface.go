@@ -28,7 +28,7 @@ type ArticleStoreInterface interface {
 	CheckUserLiked(data *types.LikeOrDislikeArticle) (bool, *types.CustomError)
 	RemoveFromLike(data *types.LikeOrDislikeArticle) *types.CustomError
 	AddCommentToArticle(data *NewComment) *types.CustomError
-	EditArticleComment(comment string, commentId uint) *types.CustomError
+	EditArticleComment(data *EditComment) *types.CustomError
 	DeleteArticleComment(userId, commentId uint) *types.CustomError
 	CheckUserProvidedData(userId uint) *types.CustomError
 }
@@ -47,6 +47,6 @@ type ArticleServiceInterface interface {
 	LikeArticle(data *types.LikeOrDislikeArticle) *types.CustomError
 	DislikeArticle(data *types.LikeOrDislikeArticle) *types.CustomError
 	AddCommentToArticle(data *NewComment) *types.CustomError
-	EditArticleComment(data string, commentId uint) *types.CustomError
+	EditArticleComment(data *EditComment) *types.CustomError
 	DeleteArticleComment(userId, commentId uint) *types.CustomError
 }

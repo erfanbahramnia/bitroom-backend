@@ -1,5 +1,19 @@
 basePath: /
 definitions:
+  article.EditComment:
+    properties:
+      article_id:
+        type: integer
+      comment:
+        minLength: 3
+        type: string
+      comment_id:
+        type: integer
+    required:
+    - article_id
+    - comment
+    - comment_id
+    type: object
   article.NewComment:
     properties:
       article_id:
@@ -205,6 +219,25 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/article.NewComment'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - articles
+  /article/comment/edit:
+    put:
+      consumes:
+      - application/json
+      description: edit comment by user
+      parameters:
+      - description: Edit comment
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/article.EditComment'
       produces:
       - application/json
       responses: {}
