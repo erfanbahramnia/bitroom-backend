@@ -29,7 +29,7 @@ type ArticleStoreInterface interface {
 	RemoveFromLike(data *types.LikeOrDislikeArticle) *types.CustomError
 	AddCommentToArticle(data *NewComment) *types.CustomError
 	EditArticleComment(data *EditComment) *types.CustomError
-	DeleteArticleComment(userId, commentId uint) *types.CustomError
+	DeleteArticleComment(data *DeleteComment) *types.CustomError
 	CheckUserProvidedData(userId uint) *types.CustomError
 }
 
@@ -48,5 +48,5 @@ type ArticleServiceInterface interface {
 	DislikeArticle(data *types.LikeOrDislikeArticle) *types.CustomError
 	AddCommentToArticle(data *NewComment) *types.CustomError
 	EditArticleComment(data *EditComment) *types.CustomError
-	DeleteArticleComment(userId, commentId uint) *types.CustomError
+	DeleteArticleComment(data *DeleteComment) *types.CustomError
 }

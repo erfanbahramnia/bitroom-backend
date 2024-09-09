@@ -1,5 +1,19 @@
 basePath: /
 definitions:
+  article.DeleteComment:
+    properties:
+      article_id:
+        type: integer
+      comment:
+        minLength: 3
+        type: string
+      comment_id:
+        type: integer
+    required:
+    - article_id
+    - comment
+    - comment_id
+    type: object
   article.EditComment:
     properties:
       article_id:
@@ -219,6 +233,25 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/article.NewComment'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - articles
+  /article/comment/delete:
+    delete:
+      consumes:
+      - application/json
+      description: delete comment by user
+      parameters:
+      - description: Edit comment
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/article.DeleteComment'
       produces:
       - application/json
       responses: {}

@@ -43,6 +43,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 
 	group.POST("/comment/add", a.AddComment, middleware.JwtMiddleware)
 	group.PUT("/comment/edit", a.EditComment, middleware.JwtMiddleware)
+	group.DELETE("/comment/delete", a.DeleteComment, middleware.JwtMiddleware)
 }
 
 // AddArticle godoc
@@ -556,6 +557,46 @@ func (a *ArticleHandler) EditComment(ctx echo.Context) error {
 	// edit comment
 	err := a.service.EditArticleComment(&data)
 	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "ok",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Description delete comment by user
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param register body DeleteComment true "Edit comment"
+// @Router /article/comment/delete [delete]
+// @Security BearerAuth
+func (a *ArticleHandler) DeleteComment(ctx echo.Context) error {
+	var data DeleteComment
+
+	// bind json to struct
+	if err := ctx.Bind(&data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, constants.InvalidInputFormat)
+	}
+
+	// validate
+	vs := utils.GetValidator()
+	vsErrs := vs.Validate(data)
+	if len(vsErrs) > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"errors": vsErrs,
+		})
+	}
+
+	// get user id
+	data.UserID = ctx.Get("user").(*types.JwtCustomClaims).Id
+
+	// delete
+	if err := a.service.DeleteArticleComment(&data); err != nil {
 		return echo.NewHTTPError(err.Code, err.Message)
 	}
 

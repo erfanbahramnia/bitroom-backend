@@ -138,6 +138,37 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/article/comment/delete": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete comment by user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "description": "Edit comment",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/article.DeleteComment"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/article/comment/edit": {
             "put": {
                 "security": [
@@ -794,6 +825,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "article.DeleteComment": {
+            "type": "object",
+            "required": [
+                "article_id",
+                "comment",
+                "comment_id"
+            ],
+            "properties": {
+                "article_id": {
+                    "type": "integer"
+                },
+                "comment": {
+                    "type": "string",
+                    "minLength": 3
+                },
+                "comment_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "article.EditComment": {
             "type": "object",
             "required": [

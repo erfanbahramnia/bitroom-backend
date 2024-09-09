@@ -479,12 +479,8 @@ func (a *ArticleService) AddCommentToArticle(data *NewComment) *types.CustomErro
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleService) EditArticleComment(data *EditComment) *types.CustomError {
-	var wg sync.WaitGroup
-
 	errChan := make(chan *types.CustomError, 1)
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
 		err := a.store.EditArticleComment(data)
 		errChan <- err
 	}()
@@ -495,7 +491,13 @@ func (a *ArticleService) EditArticleComment(data *EditComment) *types.CustomErro
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleService) DeleteArticleComment(userId, commentId uint) *types.CustomError {
+func (a *ArticleService) DeleteArticleComment(data *DeleteComment) *types.CustomError {
+	errChan := make(chan *types.CustomError, 1)
+	go func() {
+		err := a.store.DeleteArticleComment(data)
+		errChan <- err
+	}()
 
-	return nil
+	err := <-errChan
+	return err
 }

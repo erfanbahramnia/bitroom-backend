@@ -296,8 +296,18 @@ func (a *ArticleStore) EditArticleComment(data *EditComment) *types.CustomError 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) DeleteArticleComment(userId, commentId uint) *types.CustomError {
+func (a *ArticleStore) DeleteArticleComment(data *DeleteComment) *types.CustomError {
+	result := a.db.Where("article_id = ? AND user_id = ? AND id = ?", data.ArticleId, data.UserID, data.CommentId).
+		Delete(&article_model.ArticleComment{})
 
+	if result.Error != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+
+	if result.RowsAffected == 0 {
+		return utils.NewError("comment not found or no changes made", http.StatusNotFound)
+	}
+	// success
 	return nil
 }
 
