@@ -107,6 +107,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/article/comment/add": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Add comment by user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "description": "Add new comment",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/article.NewComment"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/article/dislike": {
             "put": {
                 "security": [
@@ -130,7 +161,7 @@ const docTemplate = `{
                         "name": "register",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/article.LikeOrDislikeArticle"
+                            "$ref": "#/definitions/types.LikeOrDislikeArticle"
                         }
                     }
                 ],
@@ -219,7 +250,7 @@ const docTemplate = `{
                         "name": "register",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/article.LikeOrDislikeArticle"
+                            "$ref": "#/definitions/types.LikeOrDislikeArticle"
                         }
                     }
                 ],
@@ -732,18 +763,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "article.LikeOrDislikeArticle": {
+        "article.NewComment": {
             "type": "object",
             "required": [
                 "article_id",
-                "user_id"
+                "comment"
             ],
             "properties": {
                 "article_id": {
                     "type": "integer"
                 },
-                "user_id": {
-                    "type": "integer"
+                "comment": {
+                    "type": "string",
+                    "minLength": 3
                 }
             }
         },
@@ -825,6 +857,17 @@ const docTemplate = `{
                 "parent_id": {
                     "type": "integer",
                     "minimum": 0
+                }
+            }
+        },
+        "types.LikeOrDislikeArticle": {
+            "type": "object",
+            "required": [
+                "article_id"
+            ],
+            "properties": {
+                "article_id": {
+                    "type": "integer"
                 }
             }
         },

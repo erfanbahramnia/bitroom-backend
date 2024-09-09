@@ -64,8 +64,8 @@ func (a *ArticleService) AddArticle(data *NewArticle) (*Article, *types.CustomEr
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleService) GetArticles() ([]MinimumArticle, *types.CustomError) {
-	articlesChan := make(chan []MinimumArticle, 20)
-	errChan := make(chan *types.CustomError, 20)
+	articlesChan := make(chan []MinimumArticle, 1)
+	errChan := make(chan *types.CustomError, 1)
 	go func() {
 		articles, err := a.store.GetArticles()
 		if err != nil {
@@ -87,7 +87,7 @@ func (a *ArticleService) GetArticles() ([]MinimumArticle, *types.CustomError) {
 func (a *ArticleService) GetArticleById(id uint) (*article_model.Article, *types.CustomError) {
 	var wg sync.WaitGroup
 	// check article exist
-	exists, err := utils.CheckExistence(id, a.store.CheckArticleExist, 20)
+	exists, err := utils.CheckExistence(id, a.store.CheckArticleExist, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -96,8 +96,8 @@ func (a *ArticleService) GetArticleById(id uint) (*article_model.Article, *types
 	}
 
 	// get article
-	articleChan := make(chan *article_model.Article, 20)
-	errChan := make(chan *types.CustomError, 20)
+	articleChan := make(chan *article_model.Article, 1)
+	errChan := make(chan *types.CustomError, 1)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -128,7 +128,7 @@ func (a *ArticleService) GetArticleById(id uint) (*article_model.Article, *types
 func (a *ArticleService) GetArticlesByCategory(categoryId uint) ([]MinimumArticle, *types.CustomError) {
 	var wg sync.WaitGroup
 	// check category exist
-	exists, err := utils.CheckExistence(categoryId, a.store.CheckCategoryExist, 20)
+	exists, err := utils.CheckExistence(categoryId, a.store.CheckCategoryExist, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -137,8 +137,8 @@ func (a *ArticleService) GetArticlesByCategory(categoryId uint) ([]MinimumArticl
 	}
 
 	// get articles
-	articlesChan := make(chan []MinimumArticle, 20)
-	errChan := make(chan *types.CustomError, 20)
+	articlesChan := make(chan []MinimumArticle, 1)
+	errChan := make(chan *types.CustomError, 1)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -365,9 +365,10 @@ func (a *ArticleService) GetPopularArticles() ([]MinimumArticle, *types.CustomEr
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleService) LikeArticle(data *LikeOrDislikeArticle) *types.CustomError {
+func (a *ArticleService) LikeArticle(data *types.LikeOrDislikeArticle) *types.CustomError {
+
 	// check user already liked or not
-	liked, err := a.store.CheckUserLiked(data)
+	liked, err := utils.ReactionChecker(data, a.store.CheckUserLiked)
 	if err != nil {
 		return err
 	}
@@ -375,19 +376,19 @@ func (a *ArticleService) LikeArticle(data *LikeOrDislikeArticle) *types.CustomEr
 		return utils.NewError("user already liked", http.StatusBadRequest)
 	}
 	// check user already disliked or not
-	disliked, err := a.store.CheckUserDisliked(data)
+	disliked, err := utils.ReactionChecker(data, a.store.CheckUserDisliked)
 	if err != nil {
 		return err
 	}
 	if disliked {
 		// remove from dislike
-		err = a.store.RemoveFromDislike(data)
+		err = utils.ReactionUpdator(data, a.store.RemoveFromDislike)
 		if err != nil {
 			return err
 		}
 	}
 	// update
-	err = a.store.LikeArticle(data)
+	err = utils.ReactionUpdator(data, a.store.LikeArticle)
 	if err != nil {
 		return err
 	}
@@ -397,9 +398,9 @@ func (a *ArticleService) LikeArticle(data *LikeOrDislikeArticle) *types.CustomEr
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleService) DislikeArticle(data *LikeOrDislikeArticle) *types.CustomError {
+func (a *ArticleService) DislikeArticle(data *types.LikeOrDislikeArticle) *types.CustomError {
 	// check user already disliked or not
-	disliked, err := a.store.CheckUserDisliked(data)
+	disliked, err := utils.ReactionChecker(data, a.store.CheckUserDisliked)
 	if err != nil {
 		return err
 	}
@@ -407,19 +408,19 @@ func (a *ArticleService) DislikeArticle(data *LikeOrDislikeArticle) *types.Custo
 		return utils.NewError("user already disliked", http.StatusBadRequest)
 	}
 	// check user already liked or not
-	liked, err := a.store.CheckUserLiked(data)
+	liked, err := utils.ReactionChecker(data, a.store.CheckUserLiked)
 	if err != nil {
 		return err
 	}
 	if liked {
 		// remove from like
-		err = a.store.RemoveFromLike(data)
+		err = utils.ReactionUpdator(data, a.store.RemoveFromLike)
 		if err != nil {
 			return err
 		}
 	}
 	// update
-	err = a.store.DislikeArticle(data)
+	err = utils.ReactionUpdator(data, a.store.DislikeArticle)
 	if err != nil {
 		return err
 	}
@@ -429,16 +430,57 @@ func (a *ArticleService) DislikeArticle(data *LikeOrDislikeArticle) *types.Custo
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleService) AddCommentToArticle(data *UserComment) *types.CustomError {
+func (a *ArticleService) AddCommentToArticle(data *NewComment) *types.CustomError {
+	var wg sync.WaitGroup
+	// check user data is complete
+	errChan := make(chan *types.CustomError, 10)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := a.store.CheckUserProvidedData(data.UserID); err != nil {
+			errChan <- err
+			return
+		}
+		errChan <- nil
+	}()
 
-	return nil
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+
+	err := <-errChan
+	if err != nil {
+		return err
+	}
+
+	// check article exists
+	exists, err := utils.CheckExistence(data.ArticleID, a.store.CheckArticleExist, 10)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return utils.NewError(constants.NotFound, http.StatusNotFound)
+	}
+
+	// add new comment
+	addErrChan := make(chan *types.CustomError, 10)
+	go func() {
+		if err := a.store.AddCommentToArticle(data); err != nil {
+			addErrChan <- err
+		}
+		addErrChan <- nil
+	}()
+
+	err = <-addErrChan
+	return err
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleService) EditArticleComment(data *UserComment, commentId uint) (*ArticleComment, *types.CustomError) {
+func (a *ArticleService) EditArticleComment(data string, commentId uint) *types.CustomError {
 
-	return nil, nil
+	return nil
 }
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ package article
 import (
 	"bitroom/constants"
 	"bitroom/middleware"
+	"bitroom/types"
 	"bitroom/utils"
 	"fmt"
 	"net/http"
@@ -39,6 +40,8 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 
 	group.PUT("/like", a.LikeArticle, middleware.JwtMiddleware)
 	group.PUT("/dislike", a.DislikeArticle, middleware.JwtMiddleware)
+
+	group.POST("/comment/add", a.AddComment, middleware.JwtMiddleware)
 }
 
 // AddArticle godoc
@@ -398,12 +401,12 @@ func (a *ArticleHandler) GetPopularArticles(ctx echo.Context) error {
 // @Tags articles
 // @Accept json
 // @Produce json
-// @Param register body LikeOrDislikeArticle ture "like article"
+// @Param register body types.LikeOrDislikeArticle ture "like article"
 // @Router /article/like [put]
 // @Security BearerAuth
 func (a *ArticleHandler) LikeArticle(ctx echo.Context) error {
 	// get data
-	var data LikeOrDislikeArticle
+	var data types.LikeOrDislikeArticle
 
 	// bind json to struct
 	if err := ctx.Bind(&data); err != nil {
@@ -419,6 +422,10 @@ func (a *ArticleHandler) LikeArticle(ctx echo.Context) error {
 			"errors": vsErrs,
 		})
 	}
+
+	// get user id
+	claim := ctx.Get("user").(*types.JwtCustomClaims)
+	data.UserId = claim.Id
 
 	// update article
 	if err := a.service.LikeArticle(&data); err != nil {
@@ -431,16 +438,18 @@ func (a *ArticleHandler) LikeArticle(ctx echo.Context) error {
 	})
 }
 
+// --------------------------------------------------------------------------------------------------------------------
+
 // @Description dislike article
 // @Tags articles
 // @Accept json
 // @Produce json
-// @Param register body LikeOrDislikeArticle ture "like article"
+// @Param register body types.LikeOrDislikeArticle ture "like article"
 // @Router /article/dislike [put]
 // @Security BearerAuth
 func (a *ArticleHandler) DislikeArticle(ctx echo.Context) error {
 	// get data
-	var data LikeOrDislikeArticle
+	var data types.LikeOrDislikeArticle
 
 	// bind json to struct
 	if err := ctx.Bind(&data); err != nil {
@@ -457,8 +466,56 @@ func (a *ArticleHandler) DislikeArticle(ctx echo.Context) error {
 		})
 	}
 
+	// get user id
+	claim := ctx.Get("user").(*types.JwtCustomClaims)
+	data.UserId = claim.Id
+
 	// update article
 	if err := a.service.DislikeArticle(&data); err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "ok",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Description Add comment by user
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param register body NewComment true "Add new comment"
+// @Router /article/comment/add [post]
+// @Security BearerAuth
+func (a *ArticleHandler) AddComment(ctx echo.Context) error {
+	var data NewComment
+
+	// bind json to struct
+	if err := ctx.Bind(&data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, constants.InvalidInputFormat)
+	}
+
+	// validate
+	vs := utils.GetValidator()
+	vsErrs := vs.Validate(data)
+	if len(vsErrs) > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"errors": vsErrs,
+		})
+	}
+
+	fmt.Println("2222")
+	// get user id
+	claim := ctx.Get("user").(*types.JwtCustomClaims)
+	fmt.Println("3333")
+	data.UserID = claim.Id
+
+	// add comment
+	err := a.service.AddCommentToArticle(&data)
+	if err != nil {
 		return echo.NewHTTPError(err.Code, err.Message)
 	}
 

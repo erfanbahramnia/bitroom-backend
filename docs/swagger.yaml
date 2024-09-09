@@ -1,14 +1,15 @@
 basePath: /
 definitions:
-  article.LikeOrDislikeArticle:
+  article.NewComment:
     properties:
       article_id:
         type: integer
-      user_id:
-        type: integer
+      comment:
+        minLength: 3
+        type: string
     required:
     - article_id
-    - user_id
+    - comment
     type: object
   auth.LoginCredential:
     properties:
@@ -66,6 +67,13 @@ definitions:
         type: integer
     required:
     - name
+    type: object
+  types.LikeOrDislikeArticle:
+    properties:
+      article_id:
+        type: integer
+    required:
+    - article_id
     type: object
   user.ChangePaasword:
     properties:
@@ -185,6 +193,25 @@ paths:
       summary: Get Articles By category
       tags:
       - articles
+  /article/comment/add:
+    post:
+      consumes:
+      - application/json
+      description: Add comment by user
+      parameters:
+      - description: Add new comment
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/article.NewComment'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - articles
   /article/dislike:
     put:
       consumes:
@@ -195,7 +222,7 @@ paths:
         in: body
         name: register
         schema:
-          $ref: '#/definitions/article.LikeOrDislikeArticle'
+          $ref: '#/definitions/types.LikeOrDislikeArticle'
       produces:
       - application/json
       responses: {}
@@ -252,7 +279,7 @@ paths:
         in: body
         name: register
         schema:
-          $ref: '#/definitions/article.LikeOrDislikeArticle'
+          $ref: '#/definitions/types.LikeOrDislikeArticle'
       produces:
       - application/json
       responses: {}

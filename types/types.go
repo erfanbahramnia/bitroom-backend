@@ -1,6 +1,13 @@
 package types
 
-import "github.com/dgrijalva/jwt-go"
+import (
+	"github.com/dgrijalva/jwt-go"
+)
+
+type LikeOrDislikeArticle struct {
+	UserId    uint `json:"-"`
+	ArticleId uint `json:"article_id" validate:"required"`
+}
 
 type UserDataJwtClaims struct {
 	Id    uint
@@ -31,3 +38,7 @@ type CustomError struct {
 }
 
 type ExsitenceChecker func(uint) (bool, *CustomError)
+
+type ReactionChecker func(*LikeOrDislikeArticle) (bool, *CustomError)
+
+type ReactionRemover func(*LikeOrDislikeArticle) *CustomError

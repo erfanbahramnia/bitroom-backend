@@ -75,6 +75,50 @@ func CheckExistence(id uint, checker types.ExsitenceChecker, bufferSize int) (bo
 	}
 }
 
+func ReactionChecker(data *types.LikeOrDislikeArticle, checker types.ReactionChecker) (bool, *types.CustomError) {
+	var wg sync.WaitGroup
+
+	reactionChan := make(chan bool, 1)
+	errChan := make(chan *types.CustomError, 1)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		reaction, err := checker(data)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		reactionChan <- reaction
+	}()
+
+	go func() {
+		wg.Wait()
+		close(reactionChan)
+		close(errChan)
+	}()
+
+	select {
+	case err := <-errChan:
+		return false, err
+	case reactoin := <-reactionChan:
+		return reactoin, nil
+	}
+}
+
+func ReactionUpdator(data *types.LikeOrDislikeArticle, remover types.ReactionRemover) *types.CustomError {
+	var wg sync.WaitGroup
+
+	errChan := make(chan *types.CustomError, 1)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err := remover(data)
+		errChan <- err
+	}()
+
+	err := <-errChan
+	return err
+}
 func MapStringInterface(field string, input any) map[string]interface{} {
 	return map[string]interface{}{
 		field: input,

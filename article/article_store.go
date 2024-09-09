@@ -4,8 +4,10 @@ import (
 	"bitroom/constants"
 	article_model "bitroom/models/article"
 	category_model "bitroom/models/category"
+	user_model "bitroom/models/user"
 	"bitroom/types"
 	"bitroom/utils"
+	"errors"
 	"net/http"
 
 	"gorm.io/gorm"
@@ -234,7 +236,7 @@ func (a *ArticleStore) GetPopularArticles() ([]MinimumArticle, *types.CustomErro
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) LikeArticle(data *LikeOrDislikeArticle) *types.CustomError {
+func (a *ArticleStore) LikeArticle(data *types.LikeOrDislikeArticle) *types.CustomError {
 	if err := a.db.Model(&article_model.Article{}).
 		Where("id = ?", data.ArticleId).
 		Update("likes", gorm.Expr("array_append(likes, ?)", data.UserId)).Error; err != nil {
@@ -246,7 +248,7 @@ func (a *ArticleStore) LikeArticle(data *LikeOrDislikeArticle) *types.CustomErro
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) DislikeArticle(data *LikeOrDislikeArticle) *types.CustomError {
+func (a *ArticleStore) DislikeArticle(data *types.LikeOrDislikeArticle) *types.CustomError {
 	if err := a.db.Model(&article_model.Article{}).
 		Where("id = ?", data.ArticleId).
 		Update("dislikes", gorm.Expr("array_append(dislikes, ?)", data.UserId)).Error; err != nil {
@@ -258,16 +260,25 @@ func (a *ArticleStore) DislikeArticle(data *LikeOrDislikeArticle) *types.CustomE
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) AddCommentToArticle(data *UserComment) *types.CustomError {
-
+func (a *ArticleStore) AddCommentToArticle(data *NewComment) *types.CustomError {
+	// create new comment
+	comment := article_model.ArticleComment{
+		Comment:   data.Comment,
+		ArticleID: data.ArticleID,
+		UserID:    data.UserID,
+	}
+	if err := a.db.Create(&comment).Error; err != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// success
 	return nil
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) EditArticleComment(data *UserComment, commentId uint) (*ArticleComment, *types.CustomError) {
+func (a *ArticleStore) EditArticleComment(comment string, commentId uint) *types.CustomError {
 
-	return nil, nil
+	return nil
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -320,7 +331,7 @@ func (a *ArticleStore) CheckPropertyExists(id uint) (bool, *types.CustomError) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) CheckUserDisliked(data *LikeOrDislikeArticle) (bool, *types.CustomError) {
+func (a *ArticleStore) CheckUserDisliked(data *types.LikeOrDislikeArticle) (bool, *types.CustomError) {
 	var count int64
 
 	if err := a.db.Model(&article_model.Article{}).Where("id = ?", data.ArticleId).Where("? = ANY(dislikes)", data.UserId).Count(&count).Error; err != nil {
@@ -333,7 +344,7 @@ func (a *ArticleStore) CheckUserDisliked(data *LikeOrDislikeArticle) (bool, *typ
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) RemoveFromDislike(data *LikeOrDislikeArticle) *types.CustomError {
+func (a *ArticleStore) RemoveFromDislike(data *types.LikeOrDislikeArticle) *types.CustomError {
 	if err := a.db.Model(&article_model.Article{}).
 		Where("id = ?", data.ArticleId).
 		Update("dislikes", gorm.Expr("array_remove(dislikes, ?)", data.UserId)).Error; err != nil {
@@ -345,7 +356,7 @@ func (a *ArticleStore) RemoveFromDislike(data *LikeOrDislikeArticle) *types.Cust
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) CheckUserLiked(data *LikeOrDislikeArticle) (bool, *types.CustomError) {
+func (a *ArticleStore) CheckUserLiked(data *types.LikeOrDislikeArticle) (bool, *types.CustomError) {
 	var count int64
 
 	if err := a.db.Model(&article_model.Article{}).Where("id = ?", data.ArticleId).Where("? = ANY(likes)", data.UserId).Count(&count).Error; err != nil {
@@ -358,12 +369,31 @@ func (a *ArticleStore) CheckUserLiked(data *LikeOrDislikeArticle) (bool, *types.
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (a *ArticleStore) RemoveFromLike(data *LikeOrDislikeArticle) *types.CustomError {
+func (a *ArticleStore) RemoveFromLike(data *types.LikeOrDislikeArticle) *types.CustomError {
 	if err := a.db.Model(&article_model.Article{}).
 		Where("id = ?", data.ArticleId).
 		Update("likes", gorm.Expr("array_remove(likes, ?)", data.UserId)).Error; err != nil {
 		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
 	}
 	// success
+	return nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) CheckUserProvidedData(userId uint) *types.CustomError {
+	var user user_model.User
+	// get user
+	if err := a.db.First(&user, userId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return utils.NewError("user", http.StatusNotFound)
+		}
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+	// check user data is complete
+	if user.FirstName == "" || user.LastName == "" {
+		return utils.NewError("incomplete user data", http.StatusBadRequest)
+	}
+
 	return nil
 }

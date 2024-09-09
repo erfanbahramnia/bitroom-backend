@@ -22,9 +22,6 @@ type EditArticleProperty struct {
 	Image       *string `json:"image" form:"image"`
 }
 
-type UserComment struct {
-}
-
 type Article struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
@@ -54,10 +51,8 @@ type MinimumArticle struct {
 	ID      uint   `json:"id"`
 }
 
-type ArticleComment struct {
-}
-
-type LikeOrDislikeArticle struct {
-	UserId    uint `json:"user_id" validate:"required"`
-	ArticleId uint `json:"article_id" validate:"required"`
+type NewComment struct {
+	Comment   string `json:"comment" validate:"required,min=3"`
+	UserID    uint   `json:"-"`
+	ArticleID uint   `json:"article_id" validate:"required"`
 }
