@@ -228,6 +228,27 @@ paths:
       summary: Get Articles By category
       tags:
       - articles
+  /article/change-status/{id}/{status}:
+    put:
+      parameters:
+      - description: new status
+        in: path
+        name: status
+        required: true
+        type: string
+      - description: article id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: change article status
+      tags:
+      - articles
   /article/comment/add:
     post:
       consumes:

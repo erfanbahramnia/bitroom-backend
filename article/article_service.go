@@ -501,3 +501,15 @@ func (a *ArticleService) DeleteArticleComment(data *DeleteComment) *types.Custom
 	err := <-errChan
 	return err
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleService) ChangeStatus(status string, id uint) *types.CustomError {
+	errChan := make(chan *types.CustomError, 1)
+	go func() {
+		err := a.store.ChangeStatus(status, id)
+		errChan <- err
+	}()
+	err := <-errChan
+	return err
+}

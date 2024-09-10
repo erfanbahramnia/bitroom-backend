@@ -9,3 +9,5 @@ const OtpLength = 5
 const CacheItemTimeExpiration = 3 * time.Minute
 const CachePurgesTimeExpiratoin = 5 * time.Minute
 const StaticFolderName = "public"
+
+var ValidStatus = [2]string{"Publish", "InProgress"}

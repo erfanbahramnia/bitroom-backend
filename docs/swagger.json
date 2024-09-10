@@ -104,6 +104,39 @@
                 }
             }
         },
+        "/article/change-status/{id}/{status}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "summary": "change article status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "new status",
+                        "name": "status",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/article/comment/add": {
             "post": {
                 "security": [

@@ -31,6 +31,7 @@ type ArticleStoreInterface interface {
 	EditArticleComment(data *EditComment) *types.CustomError
 	DeleteArticleComment(data *DeleteComment) *types.CustomError
 	CheckUserProvidedData(userId uint) *types.CustomError
+	ChangeStatus(status string, id uint) *types.CustomError
 }
 
 type ArticleServiceInterface interface {
@@ -49,4 +50,5 @@ type ArticleServiceInterface interface {
 	AddCommentToArticle(data *NewComment) *types.CustomError
 	EditArticleComment(data *EditComment) *types.CustomError
 	DeleteArticleComment(data *DeleteComment) *types.CustomError
+	ChangeStatus(status string, id uint) *types.CustomError
 }

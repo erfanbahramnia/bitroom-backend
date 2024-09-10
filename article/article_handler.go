@@ -31,6 +31,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group.GET("/:id", a.GetArticleById)
 	group.PUT("/edit", a.EditArticle, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 	group.DELETE("/:id", a.DeleteArticleById, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
+	group.PUT("/change-status/:id/:status", a.ChangeStatus, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 
 	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
 
@@ -601,6 +602,50 @@ func (a *ArticleHandler) DeleteComment(ctx echo.Context) error {
 	// delete
 	if err := a.service.DeleteArticleComment(&data); err != nil {
 		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "ok",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Summary change article status
+// @Tags articles
+// @Produce json
+// @Param status path string true "new status"
+// @Param id path int true "article id"
+// @Router /article/change-status/{id}/{status} [put]
+// @Security BearerAuth
+func (a *ArticleHandler) ChangeStatus(ctx echo.Context) error {
+	// get data
+	status := ctx.Param("status")
+	num, err := strconv.ParseUint(ctx.Param("id"), 10, 0)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, constants.InternalServerError)
+	}
+	id := uint(num)
+
+	// validate status
+	ok := false
+	for _, valid := range constants.ValidStatus {
+		if valid == status {
+			ok = true
+		}
+	}
+	if !ok {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"err":   "invalid status",
+			"valid": constants.ValidStatus,
+		})
+	}
+
+	// change status
+	changeErr := a.service.ChangeStatus(status, id)
+	if changeErr != nil {
+		return echo.NewHTTPError(changeErr.Code, changeErr.Message)
 	}
 
 	// success

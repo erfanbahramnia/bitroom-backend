@@ -420,3 +420,21 @@ func (a *ArticleStore) CheckUserProvidedData(userId uint) *types.CustomError {
 
 	return nil
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) ChangeStatus(status string, id uint) *types.CustomError {
+	// update status
+	result := a.db.Model(&article_model.Article{}).Where("id = ?", id).Updates(&article_model.Article{Status: status})
+
+	if result.Error != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+
+	if result.RowsAffected == 0 {
+		return utils.NewError("comment not found or no changes made", http.StatusNotFound)
+	}
+
+	// success
+	return nil
+}
