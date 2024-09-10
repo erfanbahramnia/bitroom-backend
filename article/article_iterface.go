@@ -11,6 +11,7 @@ type ArticleStoreInterface interface {
 	AddArticleProperty(data *ArticleProperty) *types.CustomError
 	GetCategory(id uint) (*category_model.Category, *types.CustomError)
 	GetArticles() ([]MinimumArticle, *types.CustomError)
+	GetArticlesByAdmin() ([]MinimumArticle, *types.CustomError)
 	GetArticleById(id uint) (*article_model.Article, *types.CustomError)
 	GetArticlesByCategory(categoryId uint) ([]MinimumArticle, *types.CustomError)
 	GetPopularArticles() ([]MinimumArticle, *types.CustomError)
@@ -19,6 +20,7 @@ type ArticleStoreInterface interface {
 	DeleteArticle(id uint) *types.CustomError
 	DeleteArticleProperty(id uint) *types.CustomError
 	CheckArticleExist(id uint) (bool, *types.CustomError)
+	CheckArticleAllStatusExist(id uint) (bool, *types.CustomError)
 	CheckCategoryExist(id uint) (bool, *types.CustomError)
 	CheckPropertyExists(id uint) (bool, *types.CustomError)
 	LikeArticle(data *types.LikeOrDislikeArticle) *types.CustomError
@@ -37,7 +39,9 @@ type ArticleStoreInterface interface {
 type ArticleServiceInterface interface {
 	AddArticle(data *NewArticle) (*Article, *types.CustomError)
 	GetArticles() ([]MinimumArticle, *types.CustomError)
+	GetArticlesByAdmin() ([]MinimumArticle, *types.CustomError)
 	GetArticleById(id uint) (*article_model.Article, *types.CustomError)
+	GetArticleByIdByAdmin(id uint) (*article_model.Article, *types.CustomError)
 	GetArticlesByCategory(categoryId uint) ([]MinimumArticle, *types.CustomError)
 	EditArticle(*EditArticle) *types.CustomError
 	DeleteArticle(id uint) *types.CustomError

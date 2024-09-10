@@ -66,6 +66,17 @@ func (a *ArticleStore) AddArticle(data *NewArticle) (*Article, *types.CustomErro
 
 func (a *ArticleStore) GetArticles() ([]MinimumArticle, *types.CustomError) {
 	var articles []MinimumArticle
+	if err := a.db.Model(&article_model.Article{}).Select("title, summary, image, id").Where("status = ?", constants.ValidStatus[0]).Find(&articles).Error; err != nil {
+		return nil, utils.NewError("could not retrive data", http.StatusInternalServerError)
+	}
+	// success
+	return articles, nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) GetArticlesByAdmin() ([]MinimumArticle, *types.CustomError) {
+	var articles []MinimumArticle
 	if err := a.db.Model(&article_model.Article{}).Select("title, summary, image, id").Find(&articles).Error; err != nil {
 		return nil, utils.NewError("could not retrive data", http.StatusInternalServerError)
 	}
@@ -314,6 +325,22 @@ func (a *ArticleStore) DeleteArticleComment(data *DeleteComment) *types.CustomEr
 // --------------------------------------------------------------------------------------------------------------------
 
 func (a *ArticleStore) CheckArticleExist(id uint) (bool, *types.CustomError) {
+	var exists bool
+	err := a.db.Model(&article_model.Article{}).
+		Select("count(*) > 0").
+		Where("ID = ? AND status = ?", id, constants.ValidStatus[0]).
+		Scan(&exists).Error
+
+	if err != nil {
+		return false, utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+
+	return exists, nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleStore) CheckArticleAllStatusExist(id uint) (bool, *types.CustomError) {
 	var exists bool
 	err := a.db.Model(&article_model.Article{}).
 		Select("count(*) > 0").

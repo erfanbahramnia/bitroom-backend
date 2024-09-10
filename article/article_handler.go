@@ -33,6 +33,9 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group.DELETE("/:id", a.DeleteArticleById, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 	group.PUT("/change-status/:id/:status", a.ChangeStatus, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 
+	group.GET("/admin/all", a.GetArticlesByAdmin, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
+	group.GET("/admin/:id", a.GetArticleByIdByAdmin, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
+
 	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
 
 	group.POST("/property/add", a.AddArticleProperty, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
@@ -120,6 +123,23 @@ func (a *ArticleHandler) GetArticles(ctx echo.Context) error {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// @Description get all articles
+// @Tags articles
+// @Produce json
+// @Router /article/admin/all [get]
+// @Security BearerAuth
+func (a *ArticleHandler) GetArticlesByAdmin(ctx echo.Context) error {
+	articles, err := a.service.GetArticlesByAdmin()
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"articles": articles,
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // @Summary Get Article By Id
 // @Tags articles
 // @Accept json
@@ -134,6 +154,32 @@ func (a *ArticleHandler) GetArticleById(ctx echo.Context) error {
 	}
 
 	article, err := a.service.GetArticleById(uint(id))
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"article": article,
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Summary Get Article By Id
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param id path int true "Article ID"
+// @Success 201
+// @Router /article/admin/{id} [get]
+// @Security BearerAuth
+func (a *ArticleHandler) GetArticleByIdByAdmin(ctx echo.Context) error {
+	id, ParsingErr := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if ParsingErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "please upload valid id")
+	}
+
+	article, err := a.service.GetArticleByIdByAdmin(uint(id))
 	if err != nil {
 		return echo.NewHTTPError(err.Code, err.Message)
 	}

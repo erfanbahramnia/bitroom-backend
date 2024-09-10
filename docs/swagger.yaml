@@ -202,6 +202,36 @@ paths:
       - BearerAuth: []
       tags:
       - articles
+  /article/admin/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - BearerAuth: []
+      summary: Get Article By Id
+      tags:
+      - articles
+  /article/admin/all:
+    get:
+      description: get all articles
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - articles
   /article/all:
     get:
       description: get all articles

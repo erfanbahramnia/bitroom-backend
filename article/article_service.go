@@ -84,10 +84,72 @@ func (a *ArticleService) GetArticles() ([]MinimumArticle, *types.CustomError) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+func (a *ArticleService) GetArticlesByAdmin() ([]MinimumArticle, *types.CustomError) {
+	articlesChan := make(chan []MinimumArticle, 1)
+	errChan := make(chan *types.CustomError, 1)
+	go func() {
+		articles, err := a.store.GetArticlesByAdmin()
+		if err != nil {
+			errChan <- err
+			return
+		}
+		articlesChan <- articles
+	}()
+	select {
+	case err := <-errChan:
+		return nil, err
+	case articles := <-articlesChan:
+		return articles, nil
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 func (a *ArticleService) GetArticleById(id uint) (*article_model.Article, *types.CustomError) {
 	var wg sync.WaitGroup
 	// check article exist
 	exists, err := utils.CheckExistence(id, a.store.CheckArticleExist, 1)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, utils.NewError(constants.NotFound, http.StatusNotFound)
+	}
+
+	// get article
+	articleChan := make(chan *article_model.Article, 1)
+	errChan := make(chan *types.CustomError, 1)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		article, err := a.store.GetArticleById(id)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		articleChan <- article
+	}()
+
+	go func() {
+		wg.Wait()
+		close(articleChan)
+		close(errChan)
+	}()
+
+	select {
+	case err := <-errChan:
+		return nil, err
+	case article := <-articleChan:
+		return article, nil
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+func (a *ArticleService) GetArticleByIdByAdmin(id uint) (*article_model.Article, *types.CustomError) {
+	var wg sync.WaitGroup
+	// check article exist
+	exists, err := utils.CheckExistence(id, a.store.CheckArticleAllStatusExist, 1)
 	if err != nil {
 		return nil, err
 	}
