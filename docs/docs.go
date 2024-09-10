@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/article/add": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Upload an article along with an image",
                 "consumes": [
                     "multipart/form-data"
@@ -232,6 +237,11 @@ const docTemplate = `{
         },
         "/article/edit": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Edit an article",
                 "consumes": [
                     "multipart/form-data"
@@ -333,6 +343,11 @@ const docTemplate = `{
         },
         "/article/property/add": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "articles"
                 ],
@@ -362,6 +377,11 @@ const docTemplate = `{
         },
         "/article/property/edit": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "articles"
                 ],
@@ -391,6 +411,11 @@ const docTemplate = `{
         },
         "/article/property/{propertyId}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "articles"
                 ],
@@ -434,6 +459,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -605,6 +635,11 @@ const docTemplate = `{
         },
         "/category/add": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Adding new category by admin",
                 "consumes": [
                     "application/json"
@@ -700,6 +735,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -728,6 +768,11 @@ const docTemplate = `{
         },
         "/category/{id}/{name}": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -759,6 +804,44 @@ const docTemplate = `{
                         "description": "Created"
                     }
                 }
+            }
+        },
+        "/developer/change-role": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "developer"
+                ],
+                "summary": "change user role",
+                "parameters": [
+                    {
+                        "description": "Changing user role",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/developer.ChangeRole"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/developer/users": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "developer"
+                ],
+                "summary": "get all users",
+                "responses": {}
             }
         },
         "/user/edit": {
@@ -829,16 +912,11 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "article_id",
-                "comment",
                 "comment_id"
             ],
             "properties": {
                 "article_id": {
                     "type": "integer"
-                },
-                "comment": {
-                    "type": "string",
-                    "minLength": 3
                 },
                 "comment_id": {
                     "type": "integer"
@@ -959,6 +1037,17 @@ const docTemplate = `{
                 "parent_id": {
                     "type": "integer",
                     "minimum": 0
+                }
+            }
+        },
+        "developer.ChangeRole": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

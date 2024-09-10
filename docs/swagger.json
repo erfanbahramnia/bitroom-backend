@@ -9,6 +9,11 @@
     "paths": {
         "/article/add": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Upload an article along with an image",
                 "consumes": [
                     "multipart/form-data"
@@ -224,6 +229,11 @@
         },
         "/article/edit": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Edit an article",
                 "consumes": [
                     "multipart/form-data"
@@ -325,6 +335,11 @@
         },
         "/article/property/add": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "articles"
                 ],
@@ -354,6 +369,11 @@
         },
         "/article/property/edit": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "articles"
                 ],
@@ -383,6 +403,11 @@
         },
         "/article/property/{propertyId}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "articles"
                 ],
@@ -426,6 +451,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -597,6 +627,11 @@
         },
         "/category/add": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Adding new category by admin",
                 "consumes": [
                     "application/json"
@@ -692,6 +727,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -720,6 +760,11 @@
         },
         "/category/{id}/{name}": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -751,6 +796,44 @@
                         "description": "Created"
                     }
                 }
+            }
+        },
+        "/developer/change-role": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "developer"
+                ],
+                "summary": "change user role",
+                "parameters": [
+                    {
+                        "description": "Changing user role",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/developer.ChangeRole"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/developer/users": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "developer"
+                ],
+                "summary": "get all users",
+                "responses": {}
             }
         },
         "/user/edit": {
@@ -821,16 +904,11 @@
             "type": "object",
             "required": [
                 "article_id",
-                "comment",
                 "comment_id"
             ],
             "properties": {
                 "article_id": {
                     "type": "integer"
-                },
-                "comment": {
-                    "type": "string",
-                    "minLength": 3
                 },
                 "comment_id": {
                     "type": "integer"
@@ -951,6 +1029,17 @@
                 "parent_id": {
                     "type": "integer",
                     "minimum": 0
+                }
+            }
+        },
+        "developer.ChangeRole": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

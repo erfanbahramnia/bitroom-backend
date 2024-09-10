@@ -4,6 +4,7 @@ import (
 	"bitroom/article"
 	"bitroom/auth"
 	"bitroom/category"
+	"bitroom/developer"
 	"bitroom/user"
 
 	"github.com/labstack/echo/v4"
@@ -34,6 +35,10 @@ func InitApi(db *gorm.DB, ech *echo.Echo, port string) {
 	articleService := article.NewArticleService(articleStore)
 	articleHandler := article.NewArticleHandler(articleService)
 	articleHandler.InitHandler(ech)
+
+	// developer apis
+	developer := developer.NewDeveloperApi(db, ech)
+	developer.InitApi()
 
 	// start server
 	ech.Logger.Fatal(ech.Start(port))

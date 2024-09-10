@@ -4,14 +4,10 @@ definitions:
     properties:
       article_id:
         type: integer
-      comment:
-        minLength: 3
-        type: string
       comment_id:
         type: integer
     required:
     - article_id
-    - comment
     - comment_id
     type: object
   article.EditComment:
@@ -96,6 +92,13 @@ definitions:
     required:
     - name
     type: object
+  developer.ChangeRole:
+    properties:
+      role:
+        type: string
+      user_id:
+        type: integer
+    type: object
   types.LikeOrDislikeArticle:
     properties:
       article_id:
@@ -139,6 +142,8 @@ paths:
       responses:
         "201":
           description: Created
+      security:
+      - BearerAuth: []
       summary: Delete Article By Id
       tags:
       - articles
@@ -193,6 +198,8 @@ paths:
       produces:
       - application/json
       responses: {}
+      security:
+      - BearerAuth: []
       tags:
       - articles
   /article/all:
@@ -333,6 +340,8 @@ paths:
       produces:
       - application/json
       responses: {}
+      security:
+      - BearerAuth: []
       tags:
       - articles
   /article/like:
@@ -370,6 +379,8 @@ paths:
         required: true
         type: integer
       responses: {}
+      security:
+      - BearerAuth: []
       tags:
       - articles
   /article/property/add:
@@ -389,6 +400,8 @@ paths:
         name: image
         type: file
       responses: {}
+      security:
+      - BearerAuth: []
       tags:
       - articles
   /article/property/edit:
@@ -408,6 +421,8 @@ paths:
         name: image
         type: file
       responses: {}
+      security:
+      - BearerAuth: []
       tags:
       - articles
   /auth/login/password:
@@ -518,6 +533,8 @@ paths:
       responses:
         "201":
           description: Created
+      security:
+      - BearerAuth: []
       summary: Delete Category By Id
       tags:
       - category
@@ -558,6 +575,8 @@ paths:
       responses:
         "201":
           description: Created
+      security:
+      - BearerAuth: []
       summary: Edit Category By Id
       tags:
       - category
@@ -578,6 +597,8 @@ paths:
       responses:
         "201":
           description: Created
+      security:
+      - BearerAuth: []
       summary: Add Category
       tags:
       - category
@@ -605,6 +626,31 @@ paths:
       summary: Get Categorys with tree format
       tags:
       - category
+  /developer/change-role:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Changing user role
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/developer.ChangeRole'
+      produces:
+      - application/json
+      responses: {}
+      summary: change user role
+      tags:
+      - developer
+  /developer/users:
+    get:
+      produces:
+      - application/json
+      responses: {}
+      summary: get all users
+      tags:
+      - developer
   /user/edit:
     put:
       consumes:

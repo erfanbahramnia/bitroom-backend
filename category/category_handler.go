@@ -2,6 +2,7 @@ package category
 
 import (
 	"bitroom/constants"
+	"bitroom/middleware"
 	"bitroom/utils"
 	"net/http"
 	"strconv"
@@ -22,12 +23,12 @@ func NewCategoryHandler(service CategoryServiceInterface) *CategoryHandler {
 func (c *CategoryHandler) InitHandler(ech *echo.Echo) {
 	group := ech.Group("category")
 
-	group.POST("/add", c.AddCategory)
+	group.POST("/add", c.AddCategory, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 	group.GET("/:id", c.GetCategoryById)
 	group.GET("/all", c.GetCategories)
 	group.GET("/tree", c.GetCategoriesTree)
-	group.PUT("/:id/:name", c.EditCategory)
-	group.DELETE("/:id", c.DeleteCategory)
+	group.PUT("/:id/:name", c.EditCategory, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
+	group.DELETE("/:id", c.DeleteCategory, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 }
 
 // @Summary Add Category
@@ -38,6 +39,7 @@ func (c *CategoryHandler) InitHandler(ech *echo.Echo) {
 // @Param category body NewCategory true "Adding new category"
 // @Success 201
 // @Router /category/add [post]
+// @Security BearerAuth
 func (c *CategoryHandler) AddCategory(ctx echo.Context) error {
 	var category NewCategory
 
@@ -139,6 +141,7 @@ func (c *CategoryHandler) GetCategoryById(ctx echo.Context) error {
 // @Param name path string true "New Name"
 // @Success 201
 // @Router /category/{id}/{name} [put]
+// @Security BearerAuth
 func (c *CategoryHandler) EditCategory(ctx echo.Context) error {
 	// get new name
 	name := ctx.Param("name")
@@ -172,6 +175,7 @@ func (c *CategoryHandler) EditCategory(ctx echo.Context) error {
 // @Param id path int true "Category ID"
 // @Success 201
 // @Router /category/{id} [delete]
+// @Security BearerAuth
 func (c *CategoryHandler) DeleteCategory(ctx echo.Context) error {
 	// get id
 	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)

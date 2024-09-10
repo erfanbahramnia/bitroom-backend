@@ -25,18 +25,18 @@ func NewArticleHandler(service ArticleServiceInterface) *ArticleHandler {
 func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 	group := ech.Group("article")
 
-	group.POST("/add", a.AddArticle)
+	group.POST("/add", a.AddArticle, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 	group.GET("/all", a.GetArticles)
 	group.GET("/popular", a.GetPopularArticles)
 	group.GET("/:id", a.GetArticleById)
-	group.PUT("/edit", a.EditArticle)
-	group.DELETE("/:id", a.DeleteArticleById)
+	group.PUT("/edit", a.EditArticle, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
+	group.DELETE("/:id", a.DeleteArticleById, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 
 	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
 
-	group.POST("/property/add", a.AddArticleProperty)
-	group.PUT("/property/edit", a.EditArticleProperty)
-	group.DELETE("/property/:propertyId", a.DeleteArticleProperty)
+	group.POST("/property/add", a.AddArticleProperty, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
+	group.PUT("/property/edit", a.EditArticleProperty, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
+	group.DELETE("/property/:propertyId", a.DeleteArticleProperty, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 
 	group.PUT("/like", a.LikeArticle, middleware.JwtMiddleware)
 	group.PUT("/dislike", a.DislikeArticle, middleware.JwtMiddleware)
@@ -57,6 +57,7 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 // @Param category formData string true "Article Category"
 // @Param image formData file true "Article Image"
 // @Router /article/add [post]
+// @Security BearerAuth
 func (a *ArticleHandler) AddArticle(ctx echo.Context) error {
 	// get data
 	title := ctx.FormValue("title")
@@ -152,6 +153,7 @@ func (a *ArticleHandler) GetArticleById(ctx echo.Context) error {
 // @Param id path int true "Article ID"
 // @Success 201
 // @Router /article/{id} [delete]
+// @Security BearerAuth
 func (a *ArticleHandler) DeleteArticleById(ctx echo.Context) error {
 	// get article id
 	id, ParsingErr := strconv.ParseUint(ctx.Param("id"), 10, 64)
@@ -208,6 +210,7 @@ func (a *ArticleHandler) GetArticlesByCategory(ctx echo.Context) error {
 // @Param id formData string false "Article id"
 // @Param image formData file false "Article Image"
 // @Router /article/edit [put]
+// @Security BearerAuth
 func (a *ArticleHandler) EditArticle(ctx echo.Context) error {
 	var editedArticle EditArticle
 
@@ -263,6 +266,7 @@ func (a *ArticleHandler) EditArticle(ctx echo.Context) error {
 // @Param article_id formData uint true "Article id"
 // @Param image formData file false "Property image"
 // @Router /article/property/add [post]
+// @Security BearerAuth
 func (a *ArticleHandler) AddArticleProperty(ctx echo.Context) error {
 	var property ArticleProperty
 	// bind json to struct
@@ -314,6 +318,7 @@ func (a *ArticleHandler) AddArticleProperty(ctx echo.Context) error {
 // @Param property_id formData uint true "Article id"
 // @Param image formData file false "Property image"
 // @Router /article/property/edit [put]
+// @Security BearerAuth
 func (a *ArticleHandler) EditArticleProperty(ctx echo.Context) error {
 	var propertyEdit EditArticleProperty
 	// bind form data to struct
@@ -360,6 +365,7 @@ func (a *ArticleHandler) EditArticleProperty(ctx echo.Context) error {
 // @Product json
 // @Param propertyId path int true "Property ID"
 // @Router /article/property/{propertyId} [delete]
+// @Security BearerAuth
 func (a *ArticleHandler) DeleteArticleProperty(ctx echo.Context) error {
 	// get id of property
 	propertyId, parsingErr := strconv.ParseUint(ctx.Param("propertyId"), 10, 64)
