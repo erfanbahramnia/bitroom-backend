@@ -59,19 +59,23 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 // @Router /article/add [post]
 // @Security BearerAuth
 func (a *ArticleHandler) AddArticle(ctx echo.Context) error {
-	// get data
-	title := ctx.FormValue("title")
-	description := ctx.FormValue("description")
-	summary := ctx.FormValue("summary")
-	// Validate required fields
-	if title == "" || description == "" || summary == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "All fields are required")
+	var data NewArticle
+
+	// bind json to struct
+	if err := ctx.Bind(&data); err != nil {
+		return ctx.JSON(http.StatusBadRequest, echo.Map{
+			"message": "Invalid input",
+			"error":   err.Error(),
+		})
 	}
 
-	// get category id
-	category, ParsingErr := strconv.ParseUint(ctx.FormValue("category"), 10, 64)
-	if ParsingErr != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "please upload valid id")
+	// validate
+	vs := utils.GetValidator()
+	vsErrs := vs.Validate(data)
+	if len(vsErrs) > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"errors": vsErrs,
+		})
 	}
 
 	// save file
@@ -83,16 +87,10 @@ func (a *ArticleHandler) AddArticle(ctx echo.Context) error {
 	if uploadErr != nil {
 		return echo.NewHTTPError(uploadErr.Code, uploadErr.Message)
 	}
+	data.Image = uploadPath
 
 	// save article
-	article := &NewArticle{
-		Title:       title,
-		Description: description,
-		Summary:     summary,
-		Category:    uint(category),
-		Image:       uploadPath,
-	}
-	InsertedData, addErr := a.service.AddArticle(article)
+	InsertedData, addErr := a.service.AddArticle(&data)
 	if addErr != nil {
 		return echo.NewHTTPError(addErr.Code, addErr.Message)
 	}
@@ -214,7 +212,6 @@ func (a *ArticleHandler) GetArticlesByCategory(ctx echo.Context) error {
 func (a *ArticleHandler) EditArticle(ctx echo.Context) error {
 	var editedArticle EditArticle
 
-	// get article id
 	// Bind form data to struct
 	if err := ctx.Bind(&editedArticle); err != nil {
 		return ctx.JSON(http.StatusBadRequest, echo.Map{

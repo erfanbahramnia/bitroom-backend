@@ -3,11 +3,11 @@ package article
 import "github.com/lib/pq"
 
 type NewArticle struct {
-	Title       string `json:"title" validate:"required,max=100"`
-	Description string `json:"description" validate:"required"`
-	Summary     string `json:"summary" validate:"required"`
-	Image       string `json:"-"`
-	Category    uint   `json:"category" validate:"required,gt=0"`
+	Title       string `form:"title" validate:"required,max=100"`
+	Description string `form:"description" validate:"required"`
+	Summary     string `form:"summary" validate:"required"`
+	Image       string `form:"-"`
+	Category    uint   `form:"category" validate:"required,gt=0"`
 }
 
 type ArticleProperty struct {
