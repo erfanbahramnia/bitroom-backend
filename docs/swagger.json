@@ -81,6 +81,66 @@
                 "responses": {}
             }
         },
+        "/article/admin/comment/delete/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "delete comment by admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Comment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/article/admin/comment/edit": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "edit comment by user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "parameters": [
+                    {
+                        "description": "Edit comment",
+                        "name": "register",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/article.EditCommentByAdmin"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/article/admin/{id}": {
             "get": {
                 "security": [
@@ -1009,6 +1069,22 @@
                 "article_id": {
                     "type": "integer"
                 },
+                "comment": {
+                    "type": "string",
+                    "minLength": 3
+                },
+                "comment_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "article.EditCommentByAdmin": {
+            "type": "object",
+            "required": [
+                "comment",
+                "comment_id"
+            ],
+            "properties": {
                 "comment": {
                     "type": "string",
                     "minLength": 3

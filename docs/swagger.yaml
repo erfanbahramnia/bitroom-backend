@@ -24,6 +24,17 @@ definitions:
     - comment
     - comment_id
     type: object
+  article.EditCommentByAdmin:
+    properties:
+      comment:
+        minLength: 3
+        type: string
+      comment_id:
+        type: integer
+    required:
+    - comment
+    - comment_id
+    type: object
   article.NewComment:
     properties:
       article_id:
@@ -225,6 +236,43 @@ paths:
   /article/admin/all:
     get:
       description: get all articles
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - articles
+  /article/admin/comment/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete comment by admin
+      parameters:
+      - description: Comment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - articles
+  /article/admin/comment/edit:
+    put:
+      consumes:
+      - application/json
+      description: edit comment by user
+      parameters:
+      - description: Edit comment
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/article.EditCommentByAdmin'
       produces:
       - application/json
       responses: {}

@@ -35,6 +35,8 @@ func (a *ArticleHandler) InitHandler(ech *echo.Echo) {
 
 	group.GET("/admin/all", a.GetArticlesByAdmin, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 	group.GET("/admin/:id", a.GetArticleByIdByAdmin, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
+	group.PUT("/admin/comment/edit", a.EditCommentByAdmin, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
+	group.DELETE("/admin/comment/delete/:id", a.DeleteCommentByAdmin, middleware.JwtMiddleware, middleware.RoleBaseMiddleware([]string{"admin", "administrator"}))
 
 	group.GET("/byCategory/:categoryId", a.GetArticlesByCategory)
 
@@ -650,6 +652,73 @@ func (a *ArticleHandler) DeleteComment(ctx echo.Context) error {
 		return echo.NewHTTPError(err.Code, err.Message)
 	}
 
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "ok",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Description edit comment by user
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param register body EditCommentByAdmin true "Edit comment"
+// @Router /article/admin/comment/edit [put]
+// @Security BearerAuth
+func (a *ArticleHandler) EditCommentByAdmin(ctx echo.Context) error {
+	var data EditComment
+
+	// bind json to struct
+	if err := ctx.Bind(&data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, constants.InvalidInputFormat)
+	}
+
+	// validate
+	vs := utils.GetValidator()
+	vsErrs := vs.Validate(data)
+	if len(vsErrs) > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"errors": vsErrs,
+		})
+	}
+
+	// get user id
+	data.UserID = ctx.Get("user").(*types.JwtCustomClaims).Id
+
+	// edit comment
+	err := a.service.EditArticleComment(&data)
+	if err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
+
+	// success
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"msg": "ok",
+	})
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// @Description delete comment by admin
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param id path int true "Comment ID"
+// @Router /article/admin/comment/delete/{id} [delete]
+// @Security BearerAuth
+func (a *ArticleHandler) DeleteCommentByAdmin(ctx echo.Context) error {
+	// get id
+	num, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, constants.InternalServerError)
+	}
+	id := uint(num)
+	// delete
+	if err := a.service.DeleteArticleCommentByAdmin(id); err != nil {
+		return echo.NewHTTPError(err.Code, err.Message)
+	}
 	// success
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"msg": "ok",

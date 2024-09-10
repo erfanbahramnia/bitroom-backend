@@ -324,6 +324,23 @@ func (a *ArticleStore) DeleteArticleComment(data *DeleteComment) *types.CustomEr
 
 // --------------------------------------------------------------------------------------------------------------------
 
+func (a *ArticleStore) DeleteArticleCommentByAdmin(id uint) *types.CustomError {
+	result := a.db.Where("id = ?", id).
+		Delete(&article_model.ArticleComment{})
+
+	if result.Error != nil {
+		return utils.NewError(constants.InternalServerError, http.StatusInternalServerError)
+	}
+
+	if result.RowsAffected == 0 {
+		return utils.NewError("comment not found or no changes made", http.StatusNotFound)
+	}
+	// success
+	return nil
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 func (a *ArticleStore) CheckArticleExist(id uint) (bool, *types.CustomError) {
 	var exists bool
 	err := a.db.Model(&article_model.Article{}).
