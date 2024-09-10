@@ -668,7 +668,7 @@ func (a *ArticleHandler) DeleteComment(ctx echo.Context) error {
 // @Router /article/admin/comment/edit [put]
 // @Security BearerAuth
 func (a *ArticleHandler) EditCommentByAdmin(ctx echo.Context) error {
-	var data EditComment
+	var data EditCommentByAdmin
 
 	// bind json to struct
 	if err := ctx.Bind(&data); err != nil {
@@ -684,11 +684,8 @@ func (a *ArticleHandler) EditCommentByAdmin(ctx echo.Context) error {
 		})
 	}
 
-	// get user id
-	data.UserID = ctx.Get("user").(*types.JwtCustomClaims).Id
-
 	// edit comment
-	err := a.service.EditArticleComment(&data)
+	err := a.service.EditArticleCommentByAdmin(&data)
 	if err != nil {
 		return echo.NewHTTPError(err.Code, err.Message)
 	}

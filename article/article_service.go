@@ -553,6 +553,19 @@ func (a *ArticleService) EditArticleComment(data *EditComment) *types.CustomErro
 
 // --------------------------------------------------------------------------------------------------------------------
 
+func (a *ArticleService) EditArticleCommentByAdmin(data *EditCommentByAdmin) *types.CustomError {
+	errChan := make(chan *types.CustomError, 1)
+	go func() {
+		err := a.store.EditArticleCommentByAdmin(data)
+		errChan <- err
+	}()
+
+	err := <-errChan
+	return err
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 func (a *ArticleService) DeleteArticleComment(data *DeleteComment) *types.CustomError {
 	errChan := make(chan *types.CustomError, 1)
 	go func() {

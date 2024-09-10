@@ -21,6 +21,7 @@ type ArticleStoreInterface interface {
 	EditArticle(*EditArticle) *types.CustomError
 	EditArticleProperty(data *EditArticleProperty) *types.CustomError
 	EditArticleComment(data *EditComment) *types.CustomError
+	EditArticleCommentByAdmin(data *EditCommentByAdmin) *types.CustomError
 	ChangeStatus(status string, id uint) *types.CustomError
 
 	DeleteArticle(id uint) *types.CustomError
@@ -56,6 +57,7 @@ type ArticleServiceInterface interface {
 
 	EditArticleProperty(data *EditArticleProperty) *types.CustomError
 	EditArticleComment(data *EditComment) *types.CustomError
+	EditArticleCommentByAdmin(data *EditCommentByAdmin) *types.CustomError
 	EditArticle(*EditArticle) *types.CustomError
 	ChangeStatus(status string, id uint) *types.CustomError
 
